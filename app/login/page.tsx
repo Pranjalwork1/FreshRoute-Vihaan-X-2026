@@ -75,12 +75,16 @@ function LoginFormContent() {
 
     try {
       const supabase = createClient();
+      const loginEmail = username.includes("@")
+        ? username.trim().toLowerCase()
+        : `${username.replace(/\D/g, "")}@freshroute.in`;
+
       if (!supabase) {
         // Prototype mode fallback
         localStorage.setItem(
           "freshroute_demo_user",
           JSON.stringify({
-            email: username,
+            email: loginEmail,
             id: "demo-user-" + Date.now(),
             full_name: username.split("@")[0],
           })
@@ -90,7 +94,7 @@ function LoginFormContent() {
       }
 
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: username,
+        email: loginEmail,
         password,
       });
 
@@ -101,7 +105,14 @@ function LoginFormContent() {
       }
 
       if (data.user) {
-        router.push(redirectTo);
+        const userRole = data.user.user_metadata?.role;
+        const target =
+          redirectTo && redirectTo !== "/dashboard/seller"
+            ? redirectTo
+            : userRole
+            ? `/dashboard/${userRole}`
+            : "/dashboard/seller";
+        router.push(target);
         router.refresh();
       }
     } catch (err: any) {

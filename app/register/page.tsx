@@ -200,39 +200,48 @@ function RegisterWizardContent() {
       const primaryRole = getPrimaryRole();
       const supabase = createClient();
 
-      if (supabase) {
-        const email = emailOrPhone.includes("@")
-          ? emailOrPhone.trim()
-          : `${emailOrPhone.replace(/\D/g, "")}@freshroute.local`;
-
-        const { data, error: signUpError } = await supabase.auth.signUp({
-          email,
+      // 1. Call server-side registration endpoint with admin confirmation
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: fullName.trim(),
+          emailOrPhone: emailOrPhone.trim(),
           password,
-          options: {
-            data: {
-              full_name: fullName.trim(),
-              role: primaryRole,
-              activities: selectedActivities,
-              state: stateName,
-              district: district.trim(),
-              pincode: pincode.trim(),
-              verified: verifyChoice === "now",
-            },
-          },
-        });
+          role: primaryRole,
+          activities: selectedActivities,
+          state: stateName,
+          district: district.trim(),
+          pincode: pincode.trim(),
+          verified: verifyChoice === "now",
+        }),
+      });
 
-        if (signUpError) {
-          setErrors({ form: signUpError.message });
-          setLoading(false);
-          return;
+      const resData = await res.json();
+
+      if (!res.ok) {
+        setErrors({ form: resData.error || "Failed to complete registration" });
+        setLoading(false);
+        return;
+      }
+
+      // 2. Client-side sign in to establish browser session
+      if (supabase && resData.user?.email) {
+        try {
+          await supabase.auth.signInWithPassword({
+            email: resData.user.email,
+            password,
+          });
+        } catch (authErr) {
+          console.warn("Client session sign-in notice:", authErr);
         }
       }
 
-      // Store local demo session as well
+      // 3. Store local demo session as well
       localStorage.setItem(
         "freshroute_demo_user",
         JSON.stringify({
-          email: emailOrPhone,
+          email: resData.user?.email || emailOrPhone,
           full_name: fullName,
           role: primaryRole,
           activities: selectedActivities,
