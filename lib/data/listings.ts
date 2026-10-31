@@ -153,6 +153,269 @@ export const INITIAL_SAMPLE_BATCHES: ProduceBatch[] = [
       avatar_url: null,
     },
   },
+  {
+    id: "sample-batch-corn",
+    seller_id: "seller-singh-farm",
+    batch_code: "FR-CRN-554109",
+    produce_name: "Sweet Corn (Golden Cob)",
+    category: "Vegetables",
+    variety: "Sugar 75",
+    description: "Freshly plucked sweet corn cobs with green husk intact, high kernel moisture and sweet taste.",
+    quantity_total: 450,
+    quantity_available: 450,
+    quantity_reserved: 0,
+    quantity_sold: 0,
+    unit: "kg",
+    price_per_unit: 22,
+    minimum_order_quantity: 40,
+    is_negotiable: true,
+    bulk_pricing_details: "₹19/kg for 200+ kg",
+    quality_grade: "Grade A",
+    harvest_date: new Date().toISOString().split("T")[0],
+    current_condition: "Moist husk, plump golden kernels",
+    storage_condition: "Ventilated crate stacks",
+    packaging_type: "Mesh sacks (25 kg)",
+    availability_deadline: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+    pickup_location_text: "Meerut Mandi Bypass, Uttar Pradesh - 250002",
+    latitude: 28.9845,
+    longitude: 77.7064,
+    status: "active",
+    created_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+    images: [],
+    seller: {
+      id: "seller-singh-farm",
+      full_name: "Harpreet Singh",
+      business_name: "Doon Valley Agro",
+      phone: "+91 98112 34567",
+      avatar_url: null,
+    },
+  },
+  {
+    id: "sample-batch-eggplant",
+    seller_id: "seller-shinde-farm",
+    batch_code: "FR-BRN-332115",
+    produce_name: "Purple Eggplant (Brinjal)",
+    category: "Vegetables",
+    variety: "Manjari Gota",
+    description: "Glossy purple skin, seedless firm pulp, ideal for institutional kitchens and retail packaging.",
+    quantity_total: 280,
+    quantity_available: 280,
+    quantity_reserved: 0,
+    quantity_sold: 0,
+    unit: "kg",
+    price_per_unit: 18,
+    minimum_order_quantity: 30,
+    is_negotiable: true,
+    quality_grade: "Grade B",
+    harvest_date: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString().split("T")[0],
+    current_condition: "Firm, glossy calyx",
+    storage_condition: "Shaded hall",
+    packaging_type: "Crates (20 kg)",
+    availability_deadline: new Date(Date.now() + 36 * 3600 * 1000).toISOString(),
+    pickup_location_text: "Saswad Road, Pune, Maharashtra - 412301",
+    latitude: 18.3444,
+    longitude: 74.0305,
+    status: "active",
+    created_at: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 6 * 3600 * 1000).toISOString(),
+    images: [],
+    seller: {
+      id: "seller-shinde-farm",
+      full_name: "Balasaheb Shinde",
+      business_name: "Sahyadri Bio Farms",
+      phone: "+91 94223 88990",
+      avatar_url: null,
+    },
+  },
+  {
+    id: "sample-batch-pepper",
+    seller_id: "seller-gowda-farm",
+    batch_code: "FR-PEP-994321",
+    produce_name: "Bell Peppers (Green Capsicum)",
+    category: "Vegetables",
+    variety: "Indra F1",
+    description: "Uniform blocky green capsicums from climate-controlled polyhouse. Thick walls and crisp texture.",
+    quantity_total: 350,
+    quantity_available: 350,
+    quantity_reserved: 0,
+    quantity_sold: 0,
+    unit: "kg",
+    price_per_unit: 42,
+    minimum_order_quantity: 25,
+    is_negotiable: true,
+    bulk_pricing_details: "₹38/kg for 150+ kg",
+    quality_grade: "Grade A",
+    harvest_date: new Date().toISOString().split("T")[0],
+    current_condition: "Deep green, crisp, thick wall",
+    storage_condition: "Cold store at 12°C",
+    packaging_type: "Corrugated boxes (10 kg)",
+    availability_deadline: new Date(Date.now() + 48 * 3600 * 1000).toISOString(),
+    pickup_location_text: "Doddaballapur Industrial Area, Bengaluru Rural, Karnataka - 561203",
+    latitude: 13.2924,
+    longitude: 77.5432,
+    status: "active",
+    created_at: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
+    images: [],
+    seller: {
+      id: "seller-gowda-farm",
+      full_name: "Naveen Gowda",
+      business_name: "Cauvery Polyhouse Produce",
+      phone: "+91 97411 22334",
+      avatar_url: null,
+    },
+  },
+  {
+    id: "sample-batch-cauliflower",
+    seller_id: "seller-malik-farm",
+    batch_code: "FR-CAU-112349",
+    produce_name: "Snowball Cauliflower",
+    category: "Vegetables",
+    variety: "Pusa Snowball K-1",
+    description: "Compact snow-white curds with fresh wrapper leaves, protected from sunlight discoloration.",
+    quantity_total: 400,
+    quantity_available: 400,
+    quantity_reserved: 0,
+    quantity_sold: 0,
+    unit: "kg",
+    price_per_unit: 25,
+    minimum_order_quantity: 40,
+    is_negotiable: false,
+    quality_grade: "Grade A",
+    harvest_date: new Date().toISOString().split("T")[0],
+    current_condition: "Tight curd, fresh cut stem",
+    storage_condition: "Ambient shaded storage",
+    packaging_type: "Ventilated crates (20 kg)",
+    availability_deadline: new Date(Date.now() + 40 * 3600 * 1000).toISOString(),
+    pickup_location_text: "GT Road Subzi Mandi, Karnal, Haryana - 132001",
+    latitude: 29.6857,
+    longitude: 76.9905,
+    status: "active",
+    created_at: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 8 * 3600 * 1000).toISOString(),
+    images: [],
+    seller: {
+      id: "seller-malik-farm",
+      full_name: "Ajay Malik",
+      business_name: "Karnal Green Producers",
+      phone: "+91 94160 55667",
+      avatar_url: null,
+    },
+  },
+  {
+    id: "sample-batch-beetroot",
+    seller_id: "seller-nair-farm",
+    batch_code: "FR-BEE-889012",
+    produce_name: "Organic Beetroot",
+    category: "Vegetables",
+    variety: "Crimson Globe",
+    description: "Deep ruby red, tender round roots with trimmed tops. Rich in natural sweetness and nitrates.",
+    quantity_total: 300,
+    quantity_available: 300,
+    quantity_reserved: 0,
+    quantity_sold: 0,
+    unit: "kg",
+    price_per_unit: 30,
+    minimum_order_quantity: 30,
+    is_negotiable: true,
+    quality_grade: "Grade A",
+    harvest_date: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString().split("T")[0],
+    current_condition: "Firm root, trimmed tops",
+    storage_condition: "Cellar storage at 8°C",
+    packaging_type: "Gunny bags (25 kg)",
+    availability_deadline: new Date(Date.now() + 72 * 3600 * 1000).toISOString(),
+    pickup_location_text: "Ooty Valley Farm Gate, Nilgiris, Tamil Nadu - 643001",
+    latitude: 11.4102,
+    longitude: 76.695,
+    status: "active",
+    created_at: new Date(Date.now() - 10 * 3600 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 10 * 3600 * 1000).toISOString(),
+    images: [],
+    seller: {
+      id: "seller-nair-farm",
+      full_name: "Karthik Nair",
+      business_name: "Nilgiri Highland Harvest",
+      phone: "+91 94430 11998",
+      avatar_url: null,
+    },
+  },
+  {
+    id: "sample-batch-pomegranate",
+    seller_id: "seller-salunkhe-farm",
+    batch_code: "FR-POM-778811",
+    produce_name: "Bhagwa Pomegranate",
+    category: "Fruits",
+    variety: "Bhagwa Export Grade",
+    description: "Ruby red soft-seeded arils with glossy rind. High sugar brix 15-16%, suitable for export & retail.",
+    quantity_total: 600,
+    quantity_available: 600,
+    quantity_reserved: 0,
+    quantity_sold: 0,
+    unit: "kg",
+    price_per_unit: 85,
+    minimum_order_quantity: 50,
+    is_negotiable: true,
+    bulk_pricing_details: "₹78/kg for 300+ kg",
+    quality_grade: "Grade A",
+    harvest_date: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString().split("T")[0],
+    current_condition: "Sound rind, no cracking",
+    storage_condition: "Pre-cooled at 7°C",
+    packaging_type: "Export CFB boxes (10 kg)",
+    availability_deadline: new Date(Date.now() + 96 * 3600 * 1000).toISOString(),
+    pickup_location_text: "Pandharpur Road, Solapur, Maharashtra - 413002",
+    latitude: 17.6599,
+    longitude: 75.9064,
+    status: "active",
+    created_at: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 14 * 3600 * 1000).toISOString(),
+    images: [],
+    seller: {
+      id: "seller-salunkhe-farm",
+      full_name: "Tanaji Salunkhe",
+      business_name: "Solapur Pomegranate Producer Org",
+      phone: "+91 98221 44556",
+      avatar_url: null,
+    },
+  },
+  {
+    id: "sample-batch-apple",
+    seller_id: "seller-thakur-orchards",
+    batch_code: "FR-APL-440918",
+    produce_name: "Royal Delicious Apples",
+    category: "Fruits",
+    variety: "Royal Delicious",
+    description: "Crisp mountain-grown red apples from high altitude orchards. Sweet aroma, calibrated size 70-80mm.",
+    quantity_total: 550,
+    quantity_available: 550,
+    quantity_reserved: 0,
+    quantity_sold: 0,
+    unit: "kg",
+    price_per_unit: 95,
+    minimum_order_quantity: 40,
+    is_negotiable: true,
+    bulk_pricing_details: "₹88/kg for 200+ kg",
+    quality_grade: "Grade A",
+    harvest_date: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString().split("T")[0],
+    current_condition: "Crisp, cold-stored, unbruised",
+    storage_condition: "CA Cold Store at 2°C",
+    packaging_type: "Telescopic apple cartons (20 kg)",
+    availability_deadline: new Date(Date.now() + 120 * 3600 * 1000).toISOString(),
+    pickup_location_text: "Thanedhar Orchard Center, Shimla, Himachal Pradesh - 171201",
+    latitude: 31.3341,
+    longitude: 77.4721,
+    status: "active",
+    created_at: new Date(Date.now() - 20 * 3600 * 1000).toISOString(),
+    updated_at: new Date(Date.now() - 20 * 3600 * 1000).toISOString(),
+    images: [],
+    seller: {
+      id: "seller-thakur-orchards",
+      full_name: "Rajinder Thakur",
+      business_name: "Himachal Highland Orchards",
+      phone: "+91 98160 33445",
+      avatar_url: null,
+    },
+  },
 ];
 
 let localBatches: ProduceBatch[] = [...INITIAL_SAMPLE_BATCHES];
@@ -192,11 +455,11 @@ export async function getMarketplaceListings(options?: {
         .gt("quantity_available", 0);
 
       if (options?.category && options.category !== "All categories") {
-        query = query.eq("category", options.category);
+        query = query.ilike("category", `%${options.category}%`);
       }
 
       if (options?.grade && options.grade !== "All grades") {
-        query = query.eq("quality_grade", options.grade);
+        query = query.ilike("quality_grade", `%${options.grade}%`);
       }
 
       if (options?.location) {
@@ -247,7 +510,13 @@ export async function getMarketplaceListings(options?: {
   );
 
   if (options?.category && options.category !== "All categories") {
-    filtered = filtered.filter((b) => b.category === options.category);
+    const cat = options.category.toLowerCase();
+    filtered = filtered.filter((b) => b.category.toLowerCase().includes(cat));
+  }
+
+  if (options?.grade && options.grade !== "All grades") {
+    const gr = options.grade.toLowerCase();
+    filtered = filtered.filter((b) => b.quality_grade.toLowerCase().includes(gr));
   }
 
   if (options?.location) {
@@ -325,7 +594,15 @@ export async function getListingById(id: string): Promise<ProduceBatch | null> {
     }
   }
 
-  const local = localBatches.find((b) => b.id === id);
+  // Resilient fallback to local sample store
+  const target = id.toLowerCase().trim();
+  const local =
+    localBatches.find((b) => b.id.toLowerCase() === target) ||
+    localBatches.find((b) => b.id.toLowerCase() === `sample-batch-${target}`) ||
+    localBatches.find((b) => target === `sample-batch-${b.id.toLowerCase()}`) ||
+    localBatches.find((b) => b.id.toLowerCase().includes(target) || target.includes(b.id.toLowerCase())) ||
+    localBatches.find((b) => b.produce_name.toLowerCase().includes(target) || target.includes(b.produce_name.toLowerCase()));
+
   return local || null;
 }
 

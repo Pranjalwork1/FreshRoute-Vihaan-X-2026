@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FreshRouteLogo } from "@/components/icons/ProduceIcons";
 import { useDeliveryLocation } from "@/lib/hooks/useDeliveryLocation";
+import { useToastAndCart } from "@/lib/hooks/useToastAndCart";
 import { LocationSelectorModal } from "@/components/location/LocationSelectorModal";
 
 export function Header({
@@ -13,10 +14,15 @@ export function Header({
 }) {
   const [category, setCategory] = useState("All categories");
   const [searchQuery, setSearchQuery] = useState("");
-  const [cartCount, setCartCount] = useState(0);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const { location, status: locationStatus } = useDeliveryLocation();
+  const { cartCount } = useToastAndCart();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,9 +65,9 @@ export function Header({
               >
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
               </svg>
-              {locationStatus === "detecting" ? (
+              {mounted && locationStatus === "detecting" ? (
                 <span className="animate-pulse">Detecting your location...</span>
-              ) : location ? (
+              ) : mounted && location ? (
                 <span>
                   Deliver to — <b>{location.locality}, {location.city}</b>
                   <span className="ml-1.5 text-[11px] underline opacity-80 hover:opacity-100 font-semibold">

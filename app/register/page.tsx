@@ -250,7 +250,7 @@ function RegisterWizardContent() {
   };
 
   return (
-    <div id="app" style={{ display: "block", minHeight: "100vh" }}>
+    <main id="app" style={{ display: "block", minHeight: "100vh" }}>
       <ProduceSvgDefs />
       <div className="au" id="au">
         <AuthBrandedPanel />
@@ -730,7 +730,7 @@ function RegisterWizardContent() {
           </div>
         </section>
       </div>
-    </div>
+    </main>
   );
 }
 

@@ -215,49 +215,72 @@ export default async function MarketplacePage({ searchParams }: SearchParamsProp
               const bgColor = getCategoryColor(l.category);
 
               return (
-                <article key={l.id} className="li">
-                  <div className="ph" style={{ background: bgColor }}>
+                <article key={l.id} className="pc group">
+                  <div className="pi">
                     {primaryImage ? (
                       <img
                         src={primaryImage}
                         alt={l.produce_name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                       />
                     ) : (
-                      <ProduceSvg name={symbol} />
+                      <ProduceSvg name={symbol} className="w-20 h-20" />
                     )}
-                    <em>{l.quality_grade || "Grade A"}</em>
+                    <span className="ex font-semibold">
+                      {l.quality_grade || "Grade A"}
+                    </span>
                   </div>
 
-                  <div className="lb">
-                    <h3>{l.produce_name}</h3>
-                    <small>
+                  <div className="pb">
+                    <div className="flex items-start justify-between gap-1">
+                      <h3 className="group-hover:text-[var(--acc)] transition-colors">
+                        {l.produce_name}
+                      </h3>
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[var(--tint)] text-[var(--acc)] whitespace-nowrap">
+                        Active
+                      </span>
+                    </div>
+
+                    <small className="text-[var(--mute)] block mt-0.5">
                       {l.seller?.business_name || l.seller?.full_name || "Verified Grower"}
-                      {l.pickup_location_text ? ` • ${l.pickup_location_text.split(",")[1] || l.pickup_location_text}` : ""}
-                    </small>
-                    <small>
-                      <strong>{l.quantity_available} {l.unit}</strong> available
-                    </small>
-                    <small>
-                      {l.harvest_date
-                        ? `Harvested: ${new Date(l.harvest_date).toLocaleDateString()}`
-                        : "Fresh harvest"}
+                      {l.pickup_location_text ? ` • ${l.pickup_location_text.split(",")[0]}` : ""}
                     </small>
 
-                    <div className="pr">
-                      ₹{l.price_per_unit}
+                    <div className="pp my-1.5">
+                      <sup>₹</sup>
+                      {l.price_per_unit}
                       <span>/{l.unit}</span>
                     </div>
 
-                    <div className="ur">
+                    <div className="space-y-0.5 text-xs text-[var(--mute)]">
+                      <div className="flex justify-between">
+                        <span>Available volume:</span>
+                        <b className="text-[var(--ink)]">{l.quantity_available} {l.unit}</b>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Harvest date:</span>
+                        <span className="text-[var(--ink)] font-medium">
+                          {l.harvest_date
+                            ? new Date(l.harvest_date).toLocaleDateString()
+                            : "Today"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="ur mt-2.5">
                       {l.availability_deadline
                         ? `Deadline: ${new Date(l.availability_deadline).toLocaleDateString()}`
                         : "Ready for immediate dispatch"}
                     </div>
 
-                    <Link className="btn" href={`/marketplace/${l.id}`}>
-                      View Details
-                    </Link>
+                    <div className="ab mt-3">
+                      <Link
+                        className="btn w-full text-center"
+                        href={`/marketplace/${l.id}`}
+                      >
+                        View Details & Offer
+                      </Link>
+                    </div>
                   </div>
                 </article>
               );

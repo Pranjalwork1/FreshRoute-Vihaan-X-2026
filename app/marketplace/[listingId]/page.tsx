@@ -3,9 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/navigation/Header";
 import { Footer } from "@/components/navigation/Footer";
-import { ProduceSvgDefs, ProduceSvg } from "@/components/icons/ProduceIcons";
+import { ProduceSvgDefs, ProducePhoto } from "@/components/icons/ProduceIcons";
 import { getListingById } from "@/lib/data/listings";
 import { createClient } from "@/lib/supabase/server";
+import { ListingActionBox } from "@/components/marketplace/ListingActionBox";
 
 interface Props {
   params: Promise<{
@@ -41,41 +42,60 @@ export default async function ListingDetailPage({ params }: Props) {
     <>
       <ProduceSvgDefs />
       <Header user={user} />
-      <main className="w py-10">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs text-[var(--mute)] mb-6">
-          <Link href="/marketplace" className="hover:underline">
+      <main className="w py-10" id="main-content">
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-[var(--mute)] mb-6">
+          <Link href="/marketplace" className="hover:text-[var(--acc)] hover:underline">
             Marketplace
           </Link>
-          <span>/</span>
+          <span aria-hidden="true">/</span>
           <Link
             href={`/marketplace?category=${encodeURIComponent(listing.category)}`}
-            className="hover:underline"
+            className="hover:text-[var(--acc)] hover:underline"
           >
             {listing.category}
           </Link>
-          <span>/</span>
-          <span className="text-[var(--ink)] font-semibold">
+          <span aria-hidden="true">/</span>
+          <span className="text-[var(--ink)] font-semibold truncate max-w-[200px] sm:max-w-none">
             {listing.produce_name}
           </span>
-        </div>
+        </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Left Column: Photographs */}
-          <div className="lg:col-span-7 space-y-4">
-            <div className="aspect-4/3 rounded-2xl overflow-hidden bg-[var(--tint)] border border-[var(--line)] flex items-center justify-center relative">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+          {/* Left Column: 3D Produce Stage & Batch Specifications */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="cg group min-h-[380px] p-8 flex items-center justify-center relative overflow-hidden">
               {primaryImage ? (
                 <img
                   src={primaryImage}
                   alt={listing.produce_name}
-                  className="w-full h-full object-cover"
+                  className="w-full max-h-[340px] object-cover rounded-xl shadow-lg"
                 />
               ) : (
-                <ProduceSvg name="tomato" className="w-40 h-40" />
+                <ProducePhoto
+                  name={listing.id}
+                  alt={listing.produce_name}
+                  className="w-56 h-56 md:w-64 md:h-64 object-contain filter drop-shadow-2xl"
+                />
               )}
-              <div className="absolute top-4 left-4 bg-[var(--sf)]/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-[var(--acc)] border border-[var(--line)]">
-                {listing.quality_grade}
+
+              {/* Quality & Verified Badges */}
+              <div className="absolute top-4 left-4 flex gap-2">
+                <span className="bg-[var(--sf)]/95 backdrop-blur px-3 py-1.5 rounded-full text-xs font-bold text-[var(--acc)] border border-[var(--line)] shadow-sm">
+                  {listing.quality_grade}
+                </span>
+                <span className="bg-[var(--tint)] px-3 py-1.5 rounded-full text-xs font-semibold text-[var(--acc)] border border-[var(--acc)]/20 shadow-sm">
+                  Direct Farm Batch
+                </span>
               </div>
+
+              {/* Availability countdown pill */}
+              {listing.availability_deadline && (
+                <div className="absolute bottom-4 right-4 bg-[var(--sf)]/95 backdrop-blur px-3 py-1.5 rounded-full text-xs font-semibold text-amber-700 border border-amber-200 shadow-sm flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  Dispatch: {new Date(listing.availability_deadline).toLocaleDateString()}
+                </div>
+              )}
             </div>
 
             {hasImages && listing.images!.length > 1 && (
@@ -83,7 +103,7 @@ export default async function ListingDetailPage({ params }: Props) {
                 {listing.images!.map((img, i) => (
                   <div
                     key={i}
-                    className="w-20 h-20 rounded-xl overflow-hidden border border-[var(--line)] bg-[var(--sf)]"
+                    className="w-20 h-20 rounded-xl overflow-hidden border border-[var(--line)] bg-[var(--sf)] shadow-xs"
                   >
                     <img
                       src={img.storage_path}
@@ -95,48 +115,52 @@ export default async function ListingDetailPage({ params }: Props) {
               </div>
             )}
 
-            {/* Specifications Card */}
-            <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-6 space-y-4">
-              <h3 className="font-bold text-base text-[var(--ink)]">
-                Batch Specifications & Harvest History
+            {/* Batch Specifications Card */}
+            <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-6 space-y-5 shadow-xs">
+              <h3 className="font-bold text-base text-[var(--ink)] flex items-center gap-2">
+                <span>📋</span> Batch Specifications & Harvest Traceability
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
-                <div>
-                  <span className="text-[var(--mute)] block">Batch Code</span>
-                  <span className="font-bold">{listing.batch_code}</span>
+                <div className="p-3 bg-[var(--tint)]/50 rounded-xl border border-[var(--line)]/50">
+                  <span className="text-[var(--mute)] block text-[11px] mb-0.5">Batch Code</span>
+                  <span className="font-bold font-mono text-[var(--ink)]">{listing.batch_code}</span>
                 </div>
-                <div>
-                  <span className="text-[var(--mute)] block">Variety / Cultivar</span>
-                  <span className="font-bold">{listing.variety || "Standard Regional"}</span>
+                <div className="p-3 bg-[var(--tint)]/50 rounded-xl border border-[var(--line)]/50">
+                  <span className="text-[var(--mute)] block text-[11px] mb-0.5">Variety / Cultivar</span>
+                  <span className="font-bold text-[var(--ink)]">{listing.variety || "Standard Regional"}</span>
                 </div>
-                <div>
-                  <span className="text-[var(--mute)] block">Harvest Date</span>
-                  <span className="font-bold">
+                <div className="p-3 bg-[var(--tint)]/50 rounded-xl border border-[var(--line)]/50">
+                  <span className="text-[var(--mute)] block text-[11px] mb-0.5">Harvest Date</span>
+                  <span className="font-bold text-[var(--ink)]">
                     {listing.harvest_date
-                      ? new Date(listing.harvest_date).toLocaleDateString()
+                      ? new Date(listing.harvest_date).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
                       : "Harvested recently"}
                   </span>
                 </div>
-                <div>
-                  <span className="text-[var(--mute)] block">Packaging Type</span>
-                  <span className="font-bold">{listing.packaging_type || "Crates"}</span>
+                <div className="p-3 bg-[var(--tint)]/50 rounded-xl border border-[var(--line)]/50">
+                  <span className="text-[var(--mute)] block text-[11px] mb-0.5">Packaging Type</span>
+                  <span className="font-bold text-[var(--ink)]">{listing.packaging_type || "Crates"}</span>
                 </div>
-                <div>
-                  <span className="text-[var(--mute)] block">Current Condition</span>
-                  <span className="font-bold">{listing.current_condition || "Firm & Fresh"}</span>
+                <div className="p-3 bg-[var(--tint)]/50 rounded-xl border border-[var(--line)]/50">
+                  <span className="text-[var(--mute)] block text-[11px] mb-0.5">Current Condition</span>
+                  <span className="font-bold text-[var(--ink)]">{listing.current_condition || "Firm & Fresh"}</span>
                 </div>
-                <div>
-                  <span className="text-[var(--mute)] block">Storage Condition</span>
-                  <span className="font-bold">{listing.storage_condition || "Ambient Shade"}</span>
+                <div className="p-3 bg-[var(--tint)]/50 rounded-xl border border-[var(--line)]/50">
+                  <span className="text-[var(--mute)] block text-[11px] mb-0.5">Storage Protocol</span>
+                  <span className="font-bold text-[var(--ink)]">{listing.storage_condition || "Ambient Shade"}</span>
                 </div>
               </div>
 
               {listing.description && (
                 <div className="pt-4 border-t border-[var(--line)]">
-                  <span className="text-xs text-[var(--mute)] block mb-1">
-                    Producer Notes:
+                  <span className="text-xs font-bold text-[var(--ink)] block mb-1">
+                    Producer Field Notes:
                   </span>
-                  <p className="text-sm text-[var(--ink)] leading-relaxed">
+                  <p className="text-xs text-[var(--mute)] leading-relaxed">
                     {listing.description}
                   </p>
                 </div>
@@ -144,113 +168,88 @@ export default async function ListingDetailPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Right Column: Pricing, Seller & Purchase Action */}
+          {/* Right Column: Pricing, Verified Producer & Interactive Action Box */}
           <div className="lg:col-span-5 space-y-6">
             <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-6 space-y-6 shadow-sm">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-[var(--acc)]">
-                  {listing.category}
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--acc)]">
+                  {listing.category} • Fresh Batch
                 </span>
-                <h1 className="text-3xl font-extrabold text-[var(--ink)] mt-1">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--ink)] mt-1 tracking-tight">
                   {listing.produce_name}
                 </h1>
-                <p className="text-xs text-[var(--mute)] mt-1">
-                  📍 {listing.pickup_location_text || "Regional Farm Location"}
+                <p className="text-xs text-[var(--mute)] mt-1.5 flex items-center gap-1.5">
+                  <span>📍</span> {listing.pickup_location_text || "Regional Farm Location"}
                 </p>
               </div>
 
+              {/* Price Callout */}
               <div className="p-4 rounded-xl bg-[var(--tint)] border border-[var(--line)]">
-                <div className="text-3xl font-black text-[var(--acc)]">
-                  ₹{listing.price_per_unit}
-                  <span className="text-sm font-normal text-[var(--mute)]">
+                <div className="text-3xl font-black text-[var(--acc)] flex items-baseline">
+                  <sup className="text-lg font-bold">₹</sup>
+                  {listing.price_per_unit}
+                  <span className="text-xs font-normal text-[var(--mute)] ml-1">
                     /{listing.unit}
                   </span>
                 </div>
                 <div className="text-xs text-[var(--mute)] mt-1 flex justify-between">
-                  <span>Minimum Order: {listing.minimum_order_quantity} {listing.unit}</span>
+                  <span>Minimum order: {listing.minimum_order_quantity} {listing.unit}</span>
                   {listing.is_negotiable && (
                     <span className="font-bold text-[var(--acc)]">
-                      ✓ Negotiable for bulk
+                      ✓ Negotiable on bulk
                     </span>
                   )}
                 </div>
+                {listing.bulk_pricing_details && (
+                  <p className="text-[11px] text-[var(--acc)] font-medium mt-1">
+                    Bulk discount: {listing.bulk_pricing_details}
+                  </p>
+                )}
               </div>
 
-              <div className="space-y-3 text-xs">
-                <div className="flex justify-between py-2 border-b border-[var(--line)]">
+              {/* Volume Indicators */}
+              <div className="space-y-2.5 text-xs">
+                <div className="flex justify-between py-1.5 border-b border-[var(--line)]">
                   <span className="text-[var(--mute)]">Available Stock:</span>
                   <span className="font-bold text-sm text-[var(--acc)]">
                     {listing.quantity_available} {listing.unit}
                   </span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-[var(--line)]">
+                <div className="flex justify-between py-1.5 border-b border-[var(--line)]">
                   <span className="text-[var(--mute)]">Total Batch Harvested:</span>
-                  <span className="font-semibold">{listing.quantity_total} {listing.unit}</span>
+                  <span className="font-semibold text-[var(--ink)]">{listing.quantity_total} {listing.unit}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-[var(--line)]">
-                  <span className="text-[var(--mute)]">Seller Quality Declaration:</span>
-                  <span className="font-semibold">{listing.quality_grade}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-[var(--line)]">
-                  <span className="text-[var(--mute)]">Dispatch Deadline:</span>
-                  <span className="font-semibold text-amber-700">
-                    {listing.availability_deadline
-                      ? new Date(listing.availability_deadline).toLocaleString()
-                      : "Immediate dispatch"}
-                  </span>
+                <div className="flex justify-between py-1.5 border-b border-[var(--line)]">
+                  <span className="text-[var(--mute)]">Quality Grade:</span>
+                  <span className="font-semibold text-[var(--ink)]">{listing.quality_grade}</span>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="space-y-3 pt-2">
-                {user ? (
-                  <div className="space-y-2">
-                    <button
-                      type="button"
-                      className="btn w-full text-center py-3"
-                      onClick={() =>
-                        alert(
-                          `Connecting you with seller ${listing.seller?.full_name || "Producer"}. In milestone C, direct instant purchase and transport booking will complete checkout.`
-                        )
-                      }
-                    >
-                      Request Quote / Contact Seller
-                    </button>
-                    <p className="text-[11px] text-center text-[var(--mute)]">
-                      Direct seller communication • Zero hidden commission
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <Link
-                      href={`/login?redirectTo=/marketplace/${listing.id}`}
-                      className="btn w-full text-center py-3"
-                    >
-                      Login to Contact Seller
-                    </Link>
-                    <p className="text-[11px] text-center text-[var(--mute)]">
-                      Verified buyers receive direct grower phone & WhatsApp details.
-                    </p>
-                  </div>
-                )}
-              </div>
+              {/* Interactive Client Action Component */}
+              <ListingActionBox
+                listing={listing}
+                isAuthenticated={!!user}
+              />
             </div>
 
-            {/* Seller Card */}
-            <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-5">
+            {/* Verified Seller Info Card */}
+            <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-5 shadow-xs">
               <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--mute)] mb-3">
-                Seller Information
+                Verified Seller & Hub
               </h4>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[var(--tint)] flex items-center justify-center font-bold text-[var(--acc)] text-base">
-                  {listing.seller?.full_name?.[0] || "S"}
+                <div className="w-12 h-12 rounded-full bg-[var(--tint)] border border-[var(--line)] flex items-center justify-center font-bold text-[var(--acc)] text-base shrink-0">
+                  {listing.seller?.full_name?.[0] || "F"}
                 </div>
-                <div>
-                  <div className="font-bold text-sm text-[var(--ink)]">
+                <div className="min-w-0">
+                  <div className="font-bold text-sm text-[var(--ink)] truncate">
                     {listing.seller?.business_name || listing.seller?.full_name || "Verified Agricultural Producer"}
                   </div>
-                  <div className="text-xs text-[var(--mute)]">
+                  <div className="text-xs text-[var(--mute)] truncate">
                     {listing.pickup_location_text?.split(",").slice(1).join(",") || "Regional Cultivator"}
+                  </div>
+                  <div className="text-[11px] text-[var(--acc)] font-semibold mt-0.5">
+                    ✓ KYC Verified • Direct Farm Dispatch
                   </div>
                 </div>
               </div>
@@ -262,4 +261,3 @@ export default async function ListingDetailPage({ params }: Props) {
     </>
   );
 }
-

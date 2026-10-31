@@ -1308,8 +1308,9 @@ h2 {
 }
 
 .fa .art svg {
-  height: 84px;
+  height: 64px;
   width: auto;
+  color: var(--acc);
 }
 
 .fa h3 {

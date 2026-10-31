@@ -111,16 +111,7 @@ export function WorkspacesSection() {
                 <div className="fa f" style={{ pointerEvents: isFlipped ? "none" : "auto" }}>
                   <div className="art">
                     {card.isSvg ? (
-                      <svg
-                        viewBox={card.art === "crate" ? "0 0 100 60" : "0 0 24 24"}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <use href={`#${card.art}`} />
-                      </svg>
+                      <ProduceSvg name={card.art} className="w-16 h-16 text-[var(--acc)]" />
                     ) : (
                       <ProducePhoto name={card.art} alt={card.title} />
                     )}

@@ -127,7 +127,7 @@ function LoginFormContent() {
   };
 
   return (
-    <div id="app" style={{ display: "block", minHeight: "100vh" }}>
+    <main id="app" style={{ display: "block", minHeight: "100vh" }}>
       <ProduceSvgDefs />
       <div className="au" id="au">
         {/* Left Branded Panel */}
@@ -266,7 +266,7 @@ function LoginFormContent() {
           </div>
         </section>
       </div>
-    </div>
+    </main>
   );
 }
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { LocationProvider } from "@/lib/hooks/useDeliveryLocation";
+import { ToastAndCartProvider } from "@/lib/hooks/useToastAndCart";
 
 export const metadata: Metadata = {
   title: "FreshRoute: from surplus to opportunity",
@@ -28,7 +29,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <LocationProvider>{children}</LocationProvider>
+        <ToastAndCartProvider>
+          <LocationProvider>{children}</LocationProvider>
+        </ToastAndCartProvider>
       </body>
     </html>
   );

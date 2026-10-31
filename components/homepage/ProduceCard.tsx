@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { ProducePhoto } from "@/components/icons/ProduceIcons";
+import { useToastAndCart } from "@/lib/hooks/useToastAndCart";
 
 export interface ProduceItem {
   id: string;
@@ -23,6 +24,7 @@ const formatHours = (h: number) => {
 
 export function ProduceCard({ item }: { item: ProduceItem }) {
   const [inCart, setInCart] = useState(false);
+  const { addToCart } = useToastAndCart();
 
   const h = item.deadlineHours;
   const isHighUrgency = h !== null && h <= 24;
@@ -37,7 +39,7 @@ export function ProduceCard({ item }: { item: ProduceItem }) {
   return (
     <article className="pc group">
       {/* Visual Image Container with Radial Lighting */}
-      <div className="pi">
+      <Link href={`/marketplace/${item.id}`} className="pi block cursor-pointer">
         <ProducePhoto
           name={item.id}
           alt={item.name}
@@ -58,14 +60,16 @@ export function ProduceCard({ item }: { item: ProduceItem }) {
         <span className="ex font-semibold">
           {item.grade.includes("Grade A") ? "Grade A" : "Verified Batch"}
         </span>
-      </div>
+      </Link>
 
       {/* Card Content Body */}
       <div className="pb">
         <div className="flex items-start justify-between gap-1">
-          <h3 className="group-hover:text-[var(--acc)] transition-colors">
-            {item.name}
-          </h3>
+          <Link href={`/marketplace/${item.id}`} className="hover:underline">
+            <h3 className="group-hover:text-[var(--acc)] transition-colors">
+              {item.name}
+            </h3>
+          </Link>
           <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[var(--tint)] text-[var(--acc)] whitespace-nowrap">
             Available
           </span>
@@ -100,11 +104,10 @@ export function ProduceCard({ item }: { item: ProduceItem }) {
 
         {/* Urgency Badge Indicator */}
         <div
-          className={`ur mt-2.5 ${
-            isHighUrgency
+          className={`ur mt-2.5 ${isHighUrgency
               ? "bg-[#FDF2E9] text-[#B95000] font-semibold border border-[#F5CBA7]/40"
               : ""
-          }`}
+            }`}
         >
           {urgencyText}
         </div>
@@ -113,19 +116,18 @@ export function ProduceCard({ item }: { item: ProduceItem }) {
         <div className="ab mt-3">
           <button
             type="button"
-            className={`btn o transition-all ${
-              inCart ? "bg-[var(--tint)] text-[var(--acc)] border-[var(--acc)]" : ""
-            }`}
+            className={`btn o transition-all ${inCart ? "bg-[var(--tint)] text-[var(--acc)] border-[var(--acc)]" : ""
+              }`}
             onClick={() => {
               setInCart(true);
-              alert(`Added ${item.name} (${item.qty} kg batch) to your active quote basket.`);
+              addToCart(item.name);
             }}
           >
             {inCart ? "In Basket ✓" : "Add to cart"}
           </button>
 
           <Link
-            href={`/marketplace?item=${item.id}`}
+            href={`/marketplace/${item.id}`}
             className="btn g text-center"
           >
             Make offer

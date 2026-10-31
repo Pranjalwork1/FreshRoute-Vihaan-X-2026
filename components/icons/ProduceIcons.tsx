@@ -3,7 +3,7 @@ import { PRODUCE_IMAGES } from "@/lib/produceImages";
 
 export function ProduceSvgDefs() {
   return (
-    <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+    <svg id="fr-produce-defs" width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
       <defs>
         <symbol id="tomato" viewBox="0 0 100 100">
           <circle cx="50" cy="57" r="35" fill="#D9473A" />
