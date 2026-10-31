@@ -2176,6 +2176,99 @@ footer a:hover {
   color: #D92D20;
 }
 
+/* Enhanced Workspace Sidebar */
+.dash-mob-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--sf);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+@media (min-width: 981px) {
+  .dash-mob-bar {
+    display: none !important;
+  }
+}
+
+.sd-role-box {
+  background: var(--tint);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 10px 0;
+}
+.sd-role-box small {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mute);
+  margin-bottom: 8px;
+}
+.sd-role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.sd-role-grid a {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 8px;
+  border-radius: 8px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--mute);
+  background: var(--sf);
+  border: 1px solid var(--line);
+  transition: all 0.2s;
+}
+.sd-role-grid a:hover {
+  border-color: var(--acc);
+  color: var(--acc);
+}
+.sd-role-grid a.on {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: var(--on);
+}
+
+.sd-foot {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sd-back {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mute);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: color 0.2s;
+}
+.sd-back:hover {
+  color: var(--acc);
+  text-decoration: underline;
+}
+
+.pn2-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.pn2-head h2 {
+  margin: 0;
+}
+
 .mn {
   padding: 28px 36px 60px;
   min-width: 0;

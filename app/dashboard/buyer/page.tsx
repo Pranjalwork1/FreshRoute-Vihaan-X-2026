@@ -100,16 +100,14 @@ export default async function BuyerDashboardPage() {
             <div className="space-y-2">
               {activeListings.map((item) => (
                 <div key={item.id} className="lr">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded bg-[var(--tint)] flex items-center justify-center">
-                      <ProduceSvg name={item.category || "tomato"} className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <b>{item.produce_name}</b>
-                      <small className="block text-xs text-[var(--mute)]">
-                        {item.pickup_location_text?.split(",").slice(-2).join(",") || "Regional"} • ₹{item.price_per_unit}/{item.unit}
-                      </small>
-                    </div>
+                  <span className="lt">
+                    <ProduceSvg name={item.category || "tomato"} className="w-8 h-8" />
+                  </span>
+                  <div>
+                    <b className="text-sm font-semibold">{item.produce_name}</b>
+                    <small>
+                      {item.pickup_location_text?.split(",").slice(-2).join(",") || "Regional"} • ₹{item.price_per_unit}/{item.unit}
+                    </small>
                   </div>
                   <Link href={`/marketplace?item=${item.id}`} className="tg2">
                     View
