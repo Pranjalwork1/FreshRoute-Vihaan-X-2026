@@ -64,10 +64,13 @@ export function Header({
               className="flex items-center gap-2 py-1 px-2.5 rounded-lg text-inherit hover:text-white hover:bg-white/10 transition-all cursor-pointer text-left focus:outline-none focus:ring-1 focus:ring-[#35A66F]"
               aria-label="Select delivery location"
             >
-              <span className="relative flex items-center justify-center">
+              <span className="relative flex items-center justify-center shrink-0" style={{ width: "14px", height: "14px" }}>
                 <svg
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
-                  className="w-3.5 h-3.5 flex-shrink-0 text-[#35A66F]"
+                  style={{ width: "14px", height: "14px", minWidth: "14px", minHeight: "14px" }}
+                  className="shrink-0 text-[#35A66F]"
                   fill="currentColor"
                   aria-hidden="true"
                 >
@@ -80,9 +83,10 @@ export function Header({
               {mounted && locationStatus === "detecting" ? (
                 <span className="animate-pulse font-medium text-white">Detecting your location...</span>
               ) : mounted && location ? (
-                <span>
-                  Deliver to — <b className="text-white font-semibold">{location.locality}, {location.city}</b>
-                  <span className="ml-1.5 text-[11px] underline opacity-85 hover:opacity-100 font-semibold text-[#80D2A6]">
+                <span className="inline-flex items-center">
+                  <span>Deliver to —&nbsp;</span>
+                  <b className="text-white font-semibold">{location.locality}, {location.city}</b>
+                  <span className="ub-change">
                     (Change)
                   </span>
                 </span>
@@ -94,11 +98,22 @@ export function Header({
             </button>
           </span>
 
-          <span>
-            <Link href="/register?role=seller">Sell on FreshRoute</Link>
-            <span className="opacity-80 cursor-pointer">हिन्दी</span>
-            <Link href="/contact">Help</Link>
-          </span>
+          <nav aria-label="Quick links" className="ub-nav">
+            <Link href="/register?role=seller">
+              Sell on FreshRoute
+            </Link>
+            <span className="ub-sep" aria-hidden="true">•</span>
+            <button
+              type="button"
+              title="Change language / भाषा बदलें"
+            >
+              हिन्दी
+            </button>
+            <span className="ub-sep" aria-hidden="true">•</span>
+            <Link href="/contact">
+              Help
+            </Link>
+          </nav>
         </div>
       </div>
 

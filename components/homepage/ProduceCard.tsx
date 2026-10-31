@@ -103,21 +103,15 @@ export function ProduceCard({ item }: { item: ProduceItem }) {
         </div>
 
         {/* Urgency Badge Indicator */}
-        <div
-          className={`ur mt-2.5 ${isHighUrgency
-              ? "bg-[#FDF2E9] text-[#B95000] font-semibold border border-[#F5CBA7]/40"
-              : ""
-            }`}
-        >
+        <div className={`ur ${isHighUrgency ? "ur-high" : ""}`}>
           {urgencyText}
         </div>
 
         {/* Action Buttons */}
-        <div className="ab mt-3">
+        <div className="ab">
           <button
             type="button"
-            className={`btn o transition-all ${inCart ? "bg-[var(--tint)] text-[var(--acc)] border-[var(--acc)]" : ""
-              }`}
+            className="btn-cart"
             onClick={() => {
               setInCart(true);
               addToCart(item.name);
@@ -128,7 +122,7 @@ export function ProduceCard({ item }: { item: ProduceItem }) {
 
           <Link
             href={`/marketplace/${item.id}`}
-            className="btn g text-center"
+            className="btn-offer"
           >
             Make offer
           </Link>

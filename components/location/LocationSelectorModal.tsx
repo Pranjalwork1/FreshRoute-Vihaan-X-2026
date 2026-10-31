@@ -4,16 +4,16 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useDeliveryLocation, DeliveryLocation } from "@/lib/hooks/useDeliveryLocation";
 
 const CURATED_LOCATIONS: (DeliveryLocation & { tag?: string })[] = [
+  { locality: "Peepal Gaon", city: "Prayagraj", state: "Uttar Pradesh", pincode: "211012", tag: "Current Area" },
   { locality: "Gomti Nagar", city: "Lucknow", state: "Uttar Pradesh", pincode: "226010", tag: "Urban Hub" },
   { locality: "Vashi APMC", city: "Navi Mumbai", state: "Maharashtra", pincode: "400703", tag: "Major APMC" },
   { locality: "Azadpur Mandi", city: "Delhi", state: "Delhi", pincode: "110033", tag: "Largest Mandi" },
   { locality: "Gultekdi Market", city: "Pune", state: "Maharashtra", pincode: "411037", tag: "Agri Terminal" },
-  { locality: "Indira Nagar", city: "Bengaluru", state: "Karnataka", pincode: "560038", tag: "Metro Hub" },
   { locality: "Pimpalgaon Hub", city: "Nashik", state: "Maharashtra", pincode: "422001", tag: "Onion/Grape Hub" },
+  { locality: "Indira Nagar", city: "Bengaluru", state: "Karnataka", pincode: "560038", tag: "Metro Hub" },
   { locality: "Kolar Mandi Yard", city: "Kolar", state: "Karnataka", pincode: "563101", tag: "Tomato Center" },
+  { locality: "Civil Lines", city: "Prayagraj", state: "Uttar Pradesh", pincode: "211001", tag: "Central Hub" },
   { locality: "Guntur Market", city: "Guntur", state: "Andhra Pradesh", pincode: "522004", tag: "Spice Mandi" },
-  { locality: "Azad Nagar", city: "Kanpur", state: "Uttar Pradesh", pincode: "208002", tag: "Commercial Hub" },
-  { locality: "Sector 26 Mandi", city: "Chandigarh", state: "Punjab", pincode: "160019", tag: "Grain/Veg Market" },
 ];
 
 export function LocationSelectorModal({
@@ -26,14 +26,6 @@ export function LocationSelectorModal({
   const { location, status, errorMsg, detectLocation, setManualLocation } = useDeliveryLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [isDetectingLocal, setIsDetectingLocal] = useState(false);
-
-  // Auto trigger detection if opened without a selected location
-  useEffect(() => {
-    if (isOpen && !location && status === "idle") {
-      setIsDetectingLocal(true);
-      detectLocation().finally(() => setIsDetectingLocal(false));
-    }
-  }, [isOpen, location, status, detectLocation]);
 
   // Close on Escape key
   useEffect(() => {
@@ -53,7 +45,7 @@ export function LocationSelectorModal({
     if (success) {
       setTimeout(() => {
         onClose();
-      }, 500);
+      }, 400);
     }
   };
 
@@ -83,7 +75,6 @@ export function LocationSelectorModal({
     });
   };
 
-  // Filter curated locations by search query
   const filteredLocations = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     if (!q) return CURATED_LOCATIONS;
@@ -102,31 +93,31 @@ export function LocationSelectorModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200"
+      className="loc-overlay"
       role="dialog"
       aria-modal="true"
       aria-labelledby="location-dialog-title"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg bg-[var(--sf)] border border-[var(--line)] rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+        className="loc-card"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="px-6 pt-6 pb-4 border-b border-[var(--line)] bg-[var(--bg)] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[var(--tint)] border border-[var(--acc)]/20 flex items-center justify-center text-[var(--acc)]">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 22px", borderBottom: "1px solid var(--line, #E1E7DE)", background: "var(--bg, #F8FAF6)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ width: "36px", height: "36px", borderRadius: "10px", background: "var(--tint, #E7F1EA)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--acc, #176B45)", flexShrink: 0 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ width: "18px", height: "18px" }}>
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
                 <circle cx="12" cy="9" r="2.5" />
               </svg>
-            </div>
+            </span>
             <div>
-              <h2 id="location-dialog-title" className="text-lg font-extrabold text-[var(--ink)] tracking-tight">
+              <h2 id="location-dialog-title" style={{ margin: 0, fontSize: "16px", fontWeight: 800, color: "var(--ink, #19251F)", letterSpacing: "-0.01em" }}>
                 Select Delivery Location
               </h2>
-              <p className="text-xs text-[var(--mute)]">
-                Accurate location ensures fresh farm rescue batches near you
+              <p style={{ margin: 0, fontSize: "12px", color: "var(--mute, #5F6D65)" }}>
+                Find fresh farm rescue batches dispatching near you
               </p>
             </div>
           </div>
@@ -134,163 +125,120 @@ export function LocationSelectorModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-[var(--tint)] hover:bg-[var(--line)] flex items-center justify-center text-[var(--mute)] hover:text-[var(--ink)] transition-colors"
+            style={{ width: "32px", height: "32px", borderRadius: "50%", background: "transparent", border: "1px solid var(--line, #E1E7DE)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--mute, #5F6D65)", cursor: "pointer", fontSize: "14px" }}
             aria-label="Close dialog"
           >
             ✕
           </button>
         </div>
 
-        <div className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
-          {/* GPS Detection Action Card */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-[#F5FAF6] to-[#EAF4EE] border border-[#35A66F]/25 shadow-xs">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-[var(--acc)] text-white shadow-sm shrink-0">
-                  {isDetecting ? (
-                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      <span className="absolute w-full h-full rounded-2xl bg-[var(--acc)] opacity-25 animate-ping" />
-                      <svg className="w-5 h-5 relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <circle cx="12" cy="12" r="8" />
-                        <circle cx="12" cy="12" r="3" fill="currentColor" />
-                        <path d="M12 2v2M12 20v2M2 12h2M20 12h2" />
-                      </svg>
-                    </>
-                  )}
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-bold text-[var(--ink)]">
-                    {isDetecting ? "Detecting GPS coordinates..." : "Use Current Location"}
-                  </h3>
-                  <p className="text-xs text-[var(--mute)]">
-                    {isDetecting
-                      ? "Requesting browser location permission..."
-                      : "Instant detection via device GPS & Geocoding"}
-                  </p>
-                </div>
+        {/* Modal Body */}
+        <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: "16px", overflowY: "auto" }}>
+          {/* Current GPS Location Card */}
+          <div style={{ padding: "14px 16px", borderRadius: "16px", background: "var(--tint, #E7F1EA)", border: "1px solid var(--line, #E1E7DE)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: 0 }}>
+              <div style={{ width: "38px", height: "38px", minWidth: "38px", borderRadius: "12px", background: "var(--acc, #176B45)", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                {isDetecting ? (
+                  <span style={{ width: "18px", height: "18px", border: "2px solid #ffffff", borderTopColor: "transparent", borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite" }} />
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" style={{ width: "20px", height: "20px" }}>
+                    <circle cx="12" cy="12" r="8" />
+                    <circle cx="12" cy="12" r="3" fill="currentColor" />
+                    <path d="M12 2v2M12 20v2M2 12h2M20 12h2" />
+                  </svg>
+                )}
               </div>
 
-              <button
-                type="button"
-                onClick={handleUseCurrentLocation}
-                disabled={isDetecting}
-                className="py-2.5 px-4 rounded-xl bg-[var(--acc)] hover:bg-[var(--acc2)] text-white text-xs font-bold shadow-xs transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer disabled:opacity-60 shrink-0"
-              >
-                {isDetecting ? "Detecting..." : "Detect Location"}
-              </button>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--ink, #19251F)" }}>
+                  {isDetecting ? "Detecting GPS location..." : location ? `${location.locality}, ${location.city}` : "Use Current Location"}
+                </div>
+                <div style={{ fontSize: "11.5px", color: "var(--mute, #5F6D65)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {isDetecting ? "Requesting device permission..." : location ? "Detected via browser GPS" : "Detect area via device GPS"}
+                </div>
+              </div>
             </div>
 
-            {/* Error or Permission Alert */}
-            {errorMsg && (
-              <div className="mt-3 p-3 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 text-xs flex items-start gap-2.5">
-                <span className="font-bold text-amber-600 text-sm">⚠️</span>
-                <div className="space-y-0.5">
-                  <p className="font-semibold">{errorMsg}</p>
-                  <p className="text-[11px] text-amber-800/80">
-                    You can search your area or select a regional APMC hub below.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Active Selected Location Badge */}
-            {location && !isDetecting && (
-              <div className="mt-3 pt-3 border-t border-[#35A66F]/15 flex items-center justify-between text-xs">
-                <span className="text-[var(--mute)]">Currently set to:</span>
-                <span className="font-extrabold text-[var(--acc)] flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[var(--acc)] inline-block" />
-                  {location.locality}, {location.city}
-                  {location.pincode && ` (${location.pincode})`}
-                </span>
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={handleUseCurrentLocation}
+              disabled={isDetecting}
+              style={{ padding: "8px 14px", borderRadius: "10px", background: "var(--acc, #176B45)", color: "var(--on, #ffffff)", fontSize: "12px", fontWeight: 700, border: "none", cursor: isDetecting ? "not-allowed" : "pointer", whiteSpace: "nowrap", flexShrink: 0, opacity: isDetecting ? 0.7 : 1 }}
+            >
+              {isDetecting ? "Detecting..." : location ? "Re-detect" : "Detect"}
+            </button>
           </div>
 
-          {/* Search Input Field */}
-          <form onSubmit={handleSearchSubmit} className="relative">
-            <div className="relative flex items-center">
-              <span className="absolute left-4 text-[var(--mute)]">
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <circle cx="11" cy="11" r="8" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search area, PIN code, Mandi, or City..."
-                className="w-full pl-11 pr-24 py-3 rounded-2xl border border-[var(--line)] bg-[var(--bg)] text-sm text-[var(--ink)] placeholder:text-[var(--mute)] focus:outline-none focus:border-[var(--acc)] focus:ring-2 focus:ring-[var(--acc)]/20 transition-all font-medium"
-              />
-              {searchQuery && (
-                <button
-                  type="submit"
-                  className="absolute right-2 px-3 py-1.5 rounded-xl bg-[var(--acc)] text-white text-xs font-bold hover:bg-[var(--acc2)] transition-colors"
-                >
-                  Apply
-                </button>
-              )}
+          {errorMsg && (
+            <div style={{ padding: "10px 14px", borderRadius: "10px", background: "#FEF6F0", border: "1px solid rgba(234, 88, 12, 0.3)", color: "#C2410C", fontSize: "12px", display: "flex", gap: "8px", alignItems: "flex-start" }}>
+              <span style={{ fontWeight: 700 }}>ℹ</span>
+              <span>{errorMsg}</span>
             </div>
+          )}
+
+          {/* Search Box */}
+          <form onSubmit={handleSearchSubmit} style={{ position: "relative", display: "flex", alignItems: "center" }}>
+            <span style={{ position: "absolute", left: "14px", color: "var(--mute, #5F6D65)", display: "flex", alignItems: "center", pointerEvents: "none" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" style={{ width: "16px", height: "16px" }}>
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search area, PIN code, or city..."
+              style={{ width: "100%", padding: "10px 80px 10px 38px", borderRadius: "14px", border: "1px solid var(--line, #E1E7DE)", background: "var(--bg, #F8FAF6)", fontSize: "13px", color: "var(--ink, #19251F)", outline: "none", boxSizing: "border-box" }}
+            />
+            {searchQuery && (
+              <button
+                type="submit"
+                style={{ position: "absolute", right: "6px", padding: "6px 12px", borderRadius: "10px", background: "var(--acc, #176B45)", color: "#ffffff", fontSize: "11px", fontWeight: 700, border: "none", cursor: "pointer" }}
+              >
+                Apply
+              </button>
+            )}
           </form>
 
-          {/* Curated Regional Hubs & Mandis */}
+          {/* Preset Hubs */}
           <div>
-            <div className="flex items-center justify-between mb-2.5">
-              <span className="text-xs font-bold uppercase tracking-wider text-[var(--mute)]">
-                Popular Agricultural & Commercial Hubs
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <span style={{ fontSize: "11.5px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--mute, #5F6D65)" }}>
+                Popular Markets & Hubs
               </span>
-              <span className="text-[11px] text-[var(--acc)] font-semibold">
+              <span style={{ fontSize: "11px", color: "var(--acc, #176B45)", fontWeight: 600 }}>
                 {filteredLocations.length} locations
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", maxHeight: "200px", overflowY: "auto" }}>
               {filteredLocations.map((item) => (
                 <button
                   key={`${item.locality}-${item.city}`}
                   type="button"
                   onClick={() => handleSelectLocation(item)}
-                  className="p-3 text-left rounded-2xl border border-[var(--line)] bg-[var(--sf)] hover:border-[var(--acc)] hover:bg-[var(--tint)]/60 transition-all group flex items-start justify-between cursor-pointer shadow-2xs hover:shadow-xs"
+                  style={{ padding: "10px 12px", textAlign: "left", borderRadius: "12px", border: "1px solid var(--line, #E1E7DE)", background: "var(--sf, #ffffff)", cursor: "pointer", display: "flex", flexDirection: "column", gap: "2px", transition: "border-color 0.2s" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--acc, #176B45)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--line, #E1E7DE)")}
                 >
-                  <div className="min-w-0 pr-2">
-                    <div className="font-bold text-xs text-[var(--ink)] group-hover:text-[var(--acc)] transition-colors truncate">
-                      {item.locality}
-                    </div>
-                    <div className="text-[11px] text-[var(--mute)] truncate">
-                      {item.city}, {item.state}
-                    </div>
-                    {item.pincode && (
-                      <div className="text-[10px] text-[var(--mute)] font-mono mt-0.5">
-                        PIN: {item.pincode}
-                      </div>
-                    )}
+                  <div style={{ fontSize: "12.5px", fontWeight: 700, color: "var(--ink, #19251F)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {item.locality}
                   </div>
-
-                  {item.tag && (
-                    <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--tint)] text-[var(--acc)] border border-[var(--acc)]/20 shrink-0">
-                      {item.tag}
-                    </span>
-                  )}
+                  <div style={{ fontSize: "11px", color: "var(--mute, #5F6D65)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {item.city}, {item.state}
+                  </div>
                 </button>
               ))}
             </div>
-
-            {filteredLocations.length === 0 && (
-              <div className="text-center py-6 text-xs text-[var(--mute)]">
-                No matching preset found. Press <b>Apply</b> to use &quot;{searchQuery}&quot; as your custom delivery area.
-              </div>
-            )}
           </div>
 
           {/* Privacy Note */}
-          <div className="pt-2 border-t border-[var(--line)] flex items-center justify-center gap-1.5 text-[11px] text-[var(--mute)]">
-            <svg className="w-3.5 h-3.5 text-[var(--acc)]" viewBox="0 0 24 24" fill="currentColor">
+          <div style={{ paddingTop: "8px", borderTop: "1px solid var(--line, #E1E7DE)", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "11px", color: "var(--mute, #5F6D65)" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ width: "12px", height: "12px", color: "var(--acc, #176B45)" }}>
               <path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 5a3 3 0 0 1 6 0v3H9V7zm3 7a2 2 0 1 1 0 4 2 2 0 0 1 0-4z" />
             </svg>
-            <span>Coordinates are kept strictly local for mandi distance calculations. Never shared publicly.</span>
+            <span>Location coordinates stay local to estimate mandi distances.</span>
           </div>
         </div>
       </div>
