@@ -8,7 +8,7 @@ export function Footer() {
       <div className="w">
         <div className="fg">
           <div>
-            <Link className="logo" href="/">
+            <Link className="logo" href="#top">
               <FreshRouteLogo className="w-[26px] h-[26px]" />
               FreshRoute
             </Link>
@@ -20,7 +20,7 @@ export function Footer() {
             <Link href="/marketplace">Marketplace</Link>
             <Link href="/for-farmers">For Farmers</Link>
             <Link href="/for-buyers">For Buyers</Link>
-            <Link href="/how-it-works">How It Works</Link>
+            <Link href="/register?role=logistics">Logistics</Link>
           </div>
           <div>
             <h4>Support</h4>
@@ -43,10 +43,9 @@ export function Footer() {
           </div>
         </div>
         <div className="cp">
-          FreshRoute — Agricultural surplus and supply-chain marketplace. Every harvest deserves a market.
+          Design preview with synthetic example data. Produce photos: Fruits-360 dataset, Copyright (c) 2017-2018 Mihai Oltean and Horea Muresan, MIT License. Drawn illustrations appear where no photo is available.
         </div>
       </div>
     </footer>
   );
 }
-

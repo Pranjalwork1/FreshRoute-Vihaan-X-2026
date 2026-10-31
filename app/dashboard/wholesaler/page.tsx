@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const WHOLESALER_NAV = [
   { label: "Overview", href: "/dashboard/wholesaler" },
+  { label: "Publish Requirement", href: "/dashboard/wholesaler" },
   { label: "Browse Marketplace", href: "/marketplace" },
   { label: "Business Profile", href: "/dashboard/settings/business" },
   { label: "Account Settings", href: "/dashboard/settings/profile" },
@@ -31,59 +32,64 @@ export default async function WholesalerDashboardPage() {
   return (
     <DashboardLayout
       roleTitle="Wholesaler & Bulk Buyer"
-      roleSubtitle="Institutional Sourcing"
+      roleSubtitle="Bulk buyer workspace"
       navItems={WHOLESALER_NAV}
       userName={userName}
       userEmail={userEmail}
     >
       <div className="space-y-6">
-        <div className="bg-[var(--tint)] border border-[var(--line)] rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="mh">
           <div>
-            <h1 className="text-2xl font-black text-[var(--ink)] tracking-tight">
-              Wholesale & Institutional Procurement
-            </h1>
-            <p className="text-sm text-[var(--mute)] mt-1">
-              Procure truckload quantities, aggregate from multiple growers, and negotiate bulk pricing.
-            </p>
+            <h1 className="text-2xl font-bold">Welcome, {userName}</h1>
+            <small>Bulk buyer workspace</small>
           </div>
           <Link href="/marketplace" className="btn">
-            Browse Bulk Lots
+            Publish Requirement
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-6">
-            <h3 className="font-bold text-base mb-2">Publish Bulk Demand</h3>
-            <p className="text-xs text-[var(--mute)] leading-relaxed mb-4">
-              State your required volume (e.g. 10 tonnes of processing tomatoes), target price, and delivery window to receive quotes from farmer groups.
-            </p>
-            <button className="btn g text-xs w-full" disabled>
-              Post Requirement (Coming in Milestone C)
-            </button>
+        {/* 4 KPI Cards */}
+        <div className="kp">
+          <div style={{ "--i": 0 } as React.CSSProperties}>
+            <small>Open requirements</small>
+            <strong>0</strong>
           </div>
+          <div style={{ "--i": 1 } as React.CSSProperties}>
+            <small>Quotes received</small>
+            <strong>0</strong>
+          </div>
+          <div style={{ "--i": 2 } as React.CSSProperties}>
+            <small>Large orders</small>
+            <strong>0</strong>
+          </div>
+          <div style={{ "--i": 3 } as React.CSSProperties}>
+            <small>Deliveries scheduled</small>
+            <strong>0</strong>
+          </div>
+        </div>
 
-          <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-6">
-            <h3 className="font-bold text-base mb-2">Supplier Discovery</h3>
-            <p className="text-xs text-[var(--mute)] leading-relaxed mb-4">
-              Discover accredited producer cooperatives, FPOs, and large farm aggregators verified across states.
-            </p>
-            <Link href="/marketplace" className="btn text-xs w-full text-center">
-              Explore Active Suppliers
+        {/* Quotes Panel */}
+        <div className="pn2">
+          <div className="flex justify-between items-center mb-4">
+            <h2>Quotes to compare</h2>
+            <Link
+              href="/marketplace"
+              className="text-xs font-semibold text-[var(--acc)] hover:underline"
+            >
+              Browse active listings
             </Link>
           </div>
 
-          <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-6">
-            <h3 className="font-bold text-base mb-2">Multi-Batch Fulfilment</h3>
-            <p className="text-xs text-[var(--mute)] leading-relaxed mb-4">
-              Combine surplus harvests from nearby smallholder farmers to meet large institutional order sizes.
+          <div className="text-center py-10">
+            <p className="text-sm text-[var(--mute)] mb-4">
+              You have no active bulk requirements published. Post your weekly demand to receive aggregated supplier quotations.
             </p>
-            <span className="text-[11px] text-[var(--acc)] font-semibold">
-              ✓ Multi-Seller Aggregation Enabled
-            </span>
+            <Link href="/marketplace" className="btn text-xs">
+              + Post Bulk Requirement
+            </Link>
           </div>
         </div>
       </div>
     </DashboardLayout>
   );
 }
-

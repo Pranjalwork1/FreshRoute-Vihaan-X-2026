@@ -45,82 +45,47 @@ export default async function SellerOverviewPage() {
   return (
     <DashboardLayout
       roleTitle="Farmer & Seller"
-      roleSubtitle="Producer Operations"
+      roleSubtitle="Seller workspace"
       navItems={SELLER_NAV}
       userEmail={user?.email}
       userName={userName}
     >
       <div className="space-y-6">
-        {/* Welcome Banner */}
-        <div className="bg-[var(--tint)] border border-[var(--line)] rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        {/* Welcome Header */}
+        <div className="mh">
           <div>
-            <h1 className="text-2xl font-black text-[var(--ink)] tracking-tight">
-              Welcome back, {userName}
-            </h1>
-            <p className="text-sm text-[var(--mute)] mt-1">
-              Your produce is exposed to active commercial buyers and regional Mandis.
-            </p>
+            <h1 className="text-2xl font-bold">Welcome, {userName}</h1>
+            <small>Seller workspace</small>
           </div>
           <Link href="/dashboard/seller/listings/new" className="btn">
-            + List New Produce
+            List New Produce
           </Link>
         </div>
 
-        {/* Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-5">
-            <span className="text-xs text-[var(--mute)] font-medium">
-              Active Listings
-            </span>
-            <div className="text-3xl font-extrabold text-[var(--acc)] mt-2">
-              {activeListings.length}
-            </div>
-            <div className="text-[11px] text-[var(--mute)] mt-1">
-              Live in marketplace
-            </div>
+        {/* 4 KPI Cards */}
+        <div className="kp">
+          <div style={{ "--i": 0 } as React.CSSProperties}>
+            <small>Active listings</small>
+            <strong>{activeListings.length}</strong>
           </div>
-
-          <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-5">
-            <span className="text-xs text-[var(--mute)] font-medium">
-              Available Quantity
-            </span>
-            <div className="text-3xl font-extrabold text-[var(--ink)] mt-2">
-              {totalAvailableQty > 0 ? totalAvailableQty.toLocaleString() : "0"}
-            </div>
-            <div className="text-[11px] text-[var(--mute)] mt-1">
-              Units across batches
-            </div>
+          <div style={{ "--i": 1 } as React.CSSProperties}>
+            <small>Available stock</small>
+            <strong>{totalAvailableQty > 0 ? `${totalAvailableQty} kg` : "0 kg"}</strong>
           </div>
-
-          <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-5">
-            <span className="text-xs text-[var(--mute)] font-medium">
-              Pending Offers
-            </span>
-            <div className="text-3xl font-extrabold text-[var(--sig)] mt-2">
-              0
-            </div>
-            <div className="text-[11px] text-[var(--mute)] mt-1">
-              New quote requests
-            </div>
+          <div style={{ "--i": 2 } as React.CSSProperties}>
+            <small>Pending offers</small>
+            <strong>0</strong>
           </div>
-
-          <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-5">
-            <span className="text-xs text-[var(--mute)] font-medium">
-              Produce Rescued
-            </span>
-            <div className="text-3xl font-extrabold text-green-700 mt-2">
-              0 kg
-            </div>
-            <div className="text-[11px] text-[var(--mute)] mt-1">
-              Awaiting completed sales
-            </div>
+          <div style={{ "--i": 3 } as React.CSSProperties}>
+            <small>Active orders</small>
+            <strong>0</strong>
           </div>
         </div>
 
-        {/* Recently Listed Produce Section */}
-        <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold">Recent Produce Batches</h2>
+        {/* Listings Panel */}
+        <div className="pn2">
+          <div className="flex justify-between items-center mb-4">
+            <h2>Your listings</h2>
             <Link
               href="/dashboard/seller/listings"
               className="text-xs font-semibold text-[var(--acc)] hover:underline"
@@ -130,40 +95,33 @@ export default async function SellerOverviewPage() {
           </div>
 
           {listings.length === 0 ? (
-            <div className="text-center py-8">
+            <div className="text-center py-10">
               <div className="w-12 h-12 rounded-full bg-[var(--tint)] text-[var(--acc)] flex items-center justify-center mx-auto mb-3">
                 <ProduceSvg name="crate" className="w-6 h-6" />
               </div>
               <p className="text-sm text-[var(--mute)] mb-4">
-                No produce has been listed yet. Add your first crop batch to connect with buyers.
+                No active produce listings in this session. Add your first harvest to connect with commercial buyers.
               </p>
               <Link href="/dashboard/seller/listings/new" className="btn text-xs">
-                Create First Listing
+                + Create Produce Listing
               </Link>
             </div>
           ) : (
-            <div className="divide-y divide-[var(--line)]">
-              {listings.slice(0, 3).map((l) => (
-                <div key={l.id} className="py-4 flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-sm text-[var(--ink)]">
-                        {l.produce_name}
-                      </span>
-                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-gray-100 font-medium">
-                        {l.category}
-                      </span>
+            <div className="space-y-2">
+              {listings.map((l) => (
+                <div key={l.id} className="lr">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded bg-[var(--tint)] flex items-center justify-center">
+                      <ProduceSvg name={l.category || "tomato"} className="w-6 h-6" />
                     </div>
-                    <div className="text-xs text-[var(--mute)] mt-1">
-                      {l.quantity_available} {l.unit} remaining • ₹{l.price_per_unit}/{l.unit}
+                    <div>
+                      <b>{l.produce_name}</b>
+                      <small className="block text-xs text-[var(--mute)]">
+                        {l.quantity_available} {l.unit} • ₹{l.price_per_unit}/{l.unit}
+                      </small>
                     </div>
                   </div>
-                  <Link
-                    href={`/marketplace/${l.id}`}
-                    className="btn g text-xs py-1.5 px-3"
-                  >
-                    View Listing
-                  </Link>
+                  <span className="tg2">{l.status}</span>
                 </div>
               ))}
             </div>
@@ -173,4 +131,3 @@ export default async function SellerOverviewPage() {
     </DashboardLayout>
   );
 }
-

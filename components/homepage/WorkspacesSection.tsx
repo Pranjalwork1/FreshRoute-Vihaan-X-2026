@@ -2,27 +2,26 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { ProduceSvg } from "@/components/icons/ProduceIcons";
+import { ProducePhoto, ProduceSvg } from "@/components/icons/ProduceIcons";
 
-interface WorkspaceCard {
-  id: string;
-  symbol: string;
+interface WorkspaceCardData {
+  art: string;
+  isSvg?: boolean;
   title: string;
   desc: string;
-  btnText: string;
-  link: string;
-  features: string[];
+  ctaText: string;
+  roleHref: string;
+  insideItems: string[];
 }
 
-const WORKSPACES: WorkspaceCard[] = [
+const WORKSPACE_CARDS: WorkspaceCardData[] = [
   {
-    id: "farmer",
-    symbol: "wheat",
+    art: "corn",
     title: "For Farmers",
     desc: "Reach more buyers and manage produce listings.",
-    btnText: "Start selling",
-    link: "/register?intent=farmer",
-    features: [
+    ctaText: "Start selling",
+    roleHref: "/register?role=seller",
+    insideItems: [
       "Add New Produce",
       "My Listings",
       "Inventory",
@@ -33,13 +32,12 @@ const WORKSPACES: WorkspaceCard[] = [
     ],
   },
   {
-    id: "retailer",
-    symbol: "mango",
+    art: "pomegranate",
     title: "For Retailers",
     desc: "Find nearby produce and place smaller orders.",
-    btnText: "Join as a retailer",
-    link: "/register?intent=retailer",
-    features: [
+    ctaText: "Join as a retailer",
+    roleHref: "/register?role=buyer",
+    insideItems: [
       "Browse Produce",
       "My Orders",
       "My Requirements",
@@ -50,13 +48,13 @@ const WORKSPACES: WorkspaceCard[] = [
     ],
   },
   {
-    id: "wholesaler",
-    symbol: "crate",
+    art: "crate",
+    isSvg: true,
     title: "For Wholesalers",
     desc: "Publish bulk requirements and negotiate purchases.",
-    btnText: "Join as a wholesaler",
-    link: "/register?intent=wholesaler",
-    features: [
+    ctaText: "Join as a wholesaler",
+    roleHref: "/register?role=wholesaler",
+    insideItems: [
       "Publish bulk requirements",
       "Compare quotations",
       "Track large orders",
@@ -66,13 +64,13 @@ const WORKSPACES: WorkspaceCard[] = [
     ],
   },
   {
-    id: "logistics",
-    symbol: "i-t",
+    art: "i-t",
+    isSvg: true,
     title: "For Logistics Providers",
     desc: "Discover delivery requests and offer transportation services.",
-    btnText: "Join as a provider",
-    link: "/register?intent=logistics_provider",
-    features: [
+    ctaText: "Join as a provider",
+    roleHref: "/register?role=logistics",
+    insideItems: [
       "Available Delivery Jobs",
       "My Vehicles",
       "My Quotes",
@@ -84,74 +82,78 @@ const WORKSPACES: WorkspaceCard[] = [
 ];
 
 export function WorkspacesSection() {
-  const [flipped, setFlipped] = useState<Record<string, boolean>>({});
+  const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
 
-  const toggleFlip = (id: string) => {
-    setFlipped((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleFlip = (index: number) => {
+    setFlippedCards((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
   };
 
   return (
     <section id="who">
       <h2>Who can use FreshRoute?</h2>
       <p className="sub">
-        Every account gets its own workspace. Flip a card to preview what’s
-        inside. You can combine activities, such as selling and buying.
+        Every account gets its own workspace. Flip a card to preview what’s inside. You can combine activities, such as selling and buying.
       </p>
 
-      <div className="who" id="who">
-        {WORKSPACES.map((w) => {
-          const isFlipped = !!flipped[w.id];
+      <div className="who" id="whogrid">
+        {WORKSPACE_CARDS.map((card, idx) => {
+          const isFlipped = !!flippedCards[idx];
           return (
-            <div key={w.id} className={`fw ${isFlipped ? "flip" : ""}`}>
+            <div
+              key={card.title}
+              className={`fw ${isFlipped ? "flip" : ""}`}
+            >
               <div className="cd">
-                {/* Front Side */}
-                <div className="fa f" inert={isFlipped ? true : undefined}>
+                {/* Front face */}
+                <div className="fa f" style={{ pointerEvents: isFlipped ? "none" : "auto" }}>
                   <div className="art">
-                    {w.symbol === "i-t" ? (
+                    {card.isSvg ? (
                       <svg
-                        viewBox="0 0 24 24"
+                        viewBox={card.art === "crate" ? "0 0 100 60" : "0 0 24 24"}
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="1.4"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="w-12 h-12"
                       >
-                        <use href="#i-t" />
+                        <use href={`#${card.art}`} />
                       </svg>
                     ) : (
-                      <ProduceSvg name={w.symbol} />
+                      <ProducePhoto name={card.art} alt={card.title} />
                     )}
                   </div>
-                  <h3>{w.title}</h3>
-                  <p>{w.desc}</p>
-                  <Link className="btn" href={w.link}>
-                    {w.btnText}
+                  <h3>{card.title}</h3>
+                  <p>{card.desc}</p>
+                  <Link className="btn" href={card.roleHref}>
+                    {card.ctaText}
                   </Link>
                   <button
                     type="button"
                     className="lk"
-                    onClick={() => toggleFlip(w.id)}
+                    onClick={() => toggleFlip(idx)}
                   >
                     Preview workspace
                   </button>
                 </div>
 
-                {/* Back Side */}
-                <div className="fa b" inert={!isFlipped ? true : undefined}>
+                {/* Back face */}
+                <div className="fa b" style={{ pointerEvents: !isFlipped ? "none" : "auto" }}>
                   <h4>Inside your workspace</h4>
                   <ul>
-                    {w.features.map((f, i) => (
-                      <li key={i}>{f}</li>
+                    {card.insideItems.map((item, itemIdx) => (
+                      <li key={itemIdx}>{item}</li>
                     ))}
                   </ul>
-                  <Link className="btn" href={w.link}>
-                    {w.btnText}
+                  <Link className="btn" href={card.roleHref}>
+                    {card.ctaText}
                   </Link>
                   <button
                     type="button"
                     className="lk"
-                    onClick={() => toggleFlip(w.id)}
+                    onClick={() => toggleFlip(idx)}
                   >
                     Back
                   </button>
@@ -168,4 +170,3 @@ export function WorkspacesSection() {
     </section>
   );
 }
-

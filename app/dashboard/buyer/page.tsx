@@ -7,7 +7,8 @@ import { ProduceSvg } from "@/components/icons/ProduceIcons";
 
 const BUYER_NAV = [
   { label: "Overview", href: "/dashboard/buyer" },
-  { label: "Browse Marketplace", href: "/marketplace" },
+  { label: "Browse Produce", href: "/marketplace" },
+  { label: "My Orders", href: "/dashboard/buyer/orders" },
   { label: "Business Profile", href: "/dashboard/settings/business" },
   { label: "Account Settings", href: "/dashboard/settings/profile" },
   { label: "Switch to Farmer View", href: "/dashboard/seller" },
@@ -35,127 +36,83 @@ export default async function BuyerDashboardPage() {
   return (
     <DashboardLayout
       roleTitle="Retailer & Buyer"
-      roleSubtitle="Produce Procurement Hub"
+      roleSubtitle="Buyer workspace"
       navItems={BUYER_NAV}
       userName={userName}
       userEmail={userEmail}
     >
       <div className="space-y-6">
-        <div className="bg-[var(--tint)] border border-[var(--line)] rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="mh">
           <div>
-            <h1 className="text-2xl font-black text-[var(--ink)] tracking-tight">
-              Buyer Workspace
-            </h1>
-            <p className="text-sm text-[var(--mute)] mt-1">
-              Source fresh surplus harvests directly from verified regional growers.
-            </p>
+            <h1 className="text-2xl font-bold">Welcome, {userName}</h1>
+            <small>Buyer workspace</small>
           </div>
           <Link href="/marketplace" className="btn">
-            Explore Live Produce
+            Browse Produce
           </Link>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-5">
-            <span className="text-xs text-[var(--mute)] font-medium">
-              Live Listings
-            </span>
-            <div className="text-3xl font-extrabold text-[var(--acc)] mt-2">
-              {activeListings.length}
-            </div>
-            <div className="text-[11px] text-[var(--mute)] mt-1">
-              Available now
-            </div>
+        {/* 4 KPI Cards */}
+        <div className="kp">
+          <div style={{ "--i": 0 } as React.CSSProperties}>
+            <small>Total purchases</small>
+            <strong>₹0</strong>
           </div>
-
-          <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-5">
-            <span className="text-xs text-[var(--mute)] font-medium">
-              Saved Produce
-            </span>
-            <div className="text-3xl font-extrabold text-[var(--ink)] mt-2">
-              0
-            </div>
-            <div className="text-[11px] text-[var(--mute)] mt-1">
-              Bookmarked batches
-            </div>
+          <div style={{ "--i": 1 } as React.CSSProperties}>
+            <small>Active orders</small>
+            <strong>0</strong>
           </div>
-
-          <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-5">
-            <span className="text-xs text-[var(--mute)] font-medium">
-              Active Enquiries
-            </span>
-            <div className="text-3xl font-extrabold text-[var(--sig)] mt-2">
-              0
-            </div>
-            <div className="text-[11px] text-[var(--mute)] mt-1">
-              Quotes awaiting reply
-            </div>
+          <div style={{ "--i": 2 } as React.CSSProperties}>
+            <small>Pending deliveries</small>
+            <strong>0</strong>
           </div>
-
-          <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-5">
-            <span className="text-xs text-[var(--mute)] font-medium">
-              Deliveries
-            </span>
-            <div className="text-3xl font-extrabold text-blue-700 mt-2">
-              0
-            </div>
-            <div className="text-[11px] text-[var(--mute)] mt-1">
-              In transit
-            </div>
+          <div style={{ "--i": 3 } as React.CSSProperties}>
+            <small>Available listings</small>
+            <strong>{activeListings.length}</strong>
           </div>
         </div>
 
-        {/* Recommended Produce */}
-        <div className="bg-[var(--sf)] border border-[var(--line)] rounded-2xl p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold">Recommended Surplus Batches</h2>
+        {/* Recommended Nearby Listings Panel */}
+        <div className="pn2">
+          <div className="flex justify-between items-center mb-4">
+            <h2>Recommended nearby listings</h2>
             <Link
               href="/marketplace"
               className="text-xs font-semibold text-[var(--acc)] hover:underline"
             >
-              Browse Full Marketplace →
+              Browse all ({activeListings.length})
             </Link>
           </div>
 
           {activeListings.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-sm text-[var(--mute)]">
-                No active produce listings available at this moment. Check back soon.
+            <div className="text-center py-10">
+              <div className="w-12 h-12 rounded-full bg-[var(--tint)] text-[var(--acc)] flex items-center justify-center mx-auto mb-3">
+                <ProduceSvg name="tomato" className="w-6 h-6" />
+              </div>
+              <p className="text-sm text-[var(--mute)] mb-4">
+                No active listings match your current delivery radius.
               </p>
+              <Link href="/marketplace" className="btn text-xs">
+                Explore All Regions
+              </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {activeListings.map((l) => (
-                <div
-                  key={l.id}
-                  className="border border-[var(--line)] rounded-xl p-4 bg-[var(--sf)] hover:shadow transition flex flex-col"
-                >
-                  <div className="aspect-video rounded-lg overflow-hidden bg-[var(--tint)] flex items-center justify-center mb-3">
-                    {l.images && l.images.length > 0 ? (
-                      <img
-                        src={l.images[0].storage_path}
-                        alt={l.produce_name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <ProduceSvg name="tomato" className="w-12 h-12" />
-                    )}
+            <div className="space-y-2">
+              {activeListings.map((item) => (
+                <div key={item.id} className="lr">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded bg-[var(--tint)] flex items-center justify-center">
+                      <ProduceSvg name={item.category || "tomato"} className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <b>{item.produce_name}</b>
+                      <small className="block text-xs text-[var(--mute)]">
+                        {item.pickup_location_text?.split(",").slice(-2).join(",") || "Regional"} • ₹{item.price_per_unit}/{item.unit}
+                      </small>
+                    </div>
                   </div>
-                  <h3 className="font-bold text-sm text-[var(--ink)]">
-                    {l.produce_name}
-                  </h3>
-                  <div className="text-xs text-[var(--mute)]">
-                    {l.quantity_available} {l.unit} available
-                  </div>
-                  <div className="text-base font-extrabold text-[var(--acc)] mt-2">
-                    ₹{l.price_per_unit}/{l.unit}
-                  </div>
-                  <Link
-                    href={`/marketplace/${l.id}`}
-                    className="btn g text-xs text-center mt-3 py-1.5"
-                  >
-                    View Details
+                  <Link href={`/marketplace?item=${item.id}`} className="tg2">
+                    View
                   </Link>
                 </div>
               ))}
@@ -166,4 +123,3 @@ export default async function BuyerDashboardPage() {
     </DashboardLayout>
   );
 }
-

@@ -1,6 +1,6 @@
 import React from "react";
 
-const FEATURES = [
+const INTEL_FEATURES = [
   {
     icon: "i-m",
     title: "Intelligent buyer matching",
@@ -33,24 +33,20 @@ export function IntelligenceSection() {
     <section id="intel">
       <h2>Smarter decisions. Less avoidable waste.</h2>
       <p className="sub">
-        FreshRoute Intelligence helps you weigh your options using real
-        listings, buyers and vehicles on the platform. It supports your
-        decision. It doesn’t promise savings or prevent spoilage.
+        FreshRoute Intelligence helps you weigh your options using real listings, buyers and vehicles on the platform. It supports your decision. It doesn’t promise savings or prevent spoilage.
       </p>
+
       <div className="ft" id="ft">
-        {FEATURES.map((f, i) => (
-          <div key={i} className="fe">
-            <span className="ic">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <use href={`#${f.icon}`} />
-              </svg>
-            </span>
-            <h3>{f.title}</h3>
-            <p>{f.desc}</p>
+        {INTEL_FEATURES.map((item) => (
+          <div key={item.title} className="fe">
+            <svg className="ic" viewBox="0 0 24 24" aria-hidden="true">
+              <use href={`#${item.icon}`} />
+            </svg>
+            <h3>{item.title}</h3>
+            <p>{item.desc}</p>
           </div>
         ))}
       </div>
     </section>
   );
 }
-

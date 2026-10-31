@@ -4,106 +4,130 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { FreshRouteLogo } from "@/components/icons/ProduceIcons";
 
-export function Header({ user }: { user?: { email?: string; fullName?: string } | null }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+export function Header({
+  user,
+}: {
+  user?: { email?: string; fullName?: string; role?: string } | null;
+}) {
+  const [category, setCategory] = useState("All categories");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [cartCount, setCartCount] = useState(0);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/marketplace?q=${encodeURIComponent(searchQuery)}&cat=${encodeURIComponent(category)}`;
+    } else {
+      window.location.href = "/marketplace";
+    }
+  };
+
+  const dashboardHref = user
+    ? user.role === "buyer"
+      ? "/dashboard/buyer"
+      : user.role === "wholesaler"
+      ? "/dashboard/wholesaler"
+      : user.role === "logistics"
+      ? "/dashboard/logistics"
+      : user.role === "admin"
+      ? "/dashboard/admin"
+      : "/dashboard/seller"
+    : "/login";
 
   return (
-    <header className="nav">
-      <div className="w nv">
-        <Link className="logo" href="/">
-          <FreshRouteLogo />
-          FreshRoute
-        </Link>
-        <nav className="nl" aria-label="Main">
-          <Link href="/">Home</Link>
-          <Link href="/marketplace">Marketplace</Link>
-          <Link href="/how-it-works">How it works</Link>
-          <Link href="/for-farmers">For Farmers</Link>
-          <Link href="/for-buyers">For Buyers</Link>
-          <Link href="/about">About</Link>
-          <Link href="/contact">Contact</Link>
-        </nav>
-        <div className="na">
-          {user ? (
-            <>
-              <Link className="btn g" href="/dashboard/seller">
-                Dashboard
-              </Link>
-              <form action="/auth/logout" method="post" className="inline">
-                <button type="submit" className="btn">
-                  Logout
-                </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <Link className="btn g" href="/login">
-                Login
-              </Link>
-              <Link className="btn" href="/register">
-                Join FreshRoute
-              </Link>
-            </>
-          )}
-
-          <details
-            className="mm"
-            open={menuOpen}
-            onToggle={(e) => setMenuOpen((e.target as HTMLDetailsElement).open)}
-          >
-            <summary>Menu</summary>
-            <div>
-              <Link href="/marketplace" onClick={() => setMenuOpen(false)}>
-                Marketplace
-              </Link>
-              <Link href="/how-it-works" onClick={() => setMenuOpen(false)}>
-                How it works
-              </Link>
-              <Link href="/for-farmers" onClick={() => setMenuOpen(false)}>
-                For Farmers
-              </Link>
-              <Link href="/for-buyers" onClick={() => setMenuOpen(false)}>
-                For Buyers
-              </Link>
-              <Link href="/about" onClick={() => setMenuOpen(false)}>
-                About
-              </Link>
-              <Link href="/contact" onClick={() => setMenuOpen(false)}>
-                Contact
-              </Link>
-              {user ? (
-                <>
-                  <Link href="/dashboard/seller" onClick={() => setMenuOpen(false)}>
-                    Dashboard
-                  </Link>
-                  <form action="/auth/logout" method="post">
-                    <button
-                      type="submit"
-                      className="text-left w-full py-2 px-3 text-red-600 font-medium text-sm"
-                    >
-                      Logout
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <>
-                  <Link href="/login" onClick={() => setMenuOpen(false)}>
-                    Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="font-bold text-[#176B45]"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Join FreshRoute
-                  </Link>
-                </>
-              )}
-            </div>
-          </details>
+    <>
+      {/* 1. Utility Top Bar */}
+      <div className="ub">
+        <div className="w">
+          <span>
+            Deliver to <b>Locality A</b> (example location)
+          </span>
+          <span>
+            <Link href="/register?role=seller">Sell on FreshRoute</Link>
+            <span className="opacity-80 cursor-pointer">हिन्दी</span>
+            <Link href="/contact">Help</Link>
+          </span>
         </div>
       </div>
-    </header>
+
+      {/* 2. Main Forest Green Header */}
+      <header className="tp">
+        <div className="w mb">
+          <Link className="logo" href="/">
+            <FreshRouteLogo />
+            FreshRoute
+          </Link>
+
+          <form className="sb" role="search" onSubmit={handleSearch}>
+            <select
+              id="cat"
+              aria-label="Category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option>All categories</option>
+              <option>Vegetables</option>
+              <option>Fruits</option>
+              <option>Grains</option>
+              <option>Pulses</option>
+              <option>Seasonal Produce</option>
+              <option>Other Produce</option>
+            </select>
+            <input
+              placeholder="Search produce"
+              aria-label="Search produce"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit">Search</button>
+          </form>
+
+          {user ? (
+            <Link className="ac" href={dashboardHref}>
+              Hello, {user.fullName || user.email?.split("@")[0] || "Partner"}
+              <b>Workspace & Account</b>
+            </Link>
+          ) : (
+            <Link className="ac" href="/login">
+              Hello, sign in
+              <b>Account and workspace</b>
+            </Link>
+          )}
+
+          <Link className="ca" href="/marketplace" aria-label="Cart">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M3 4h3l2.4 11h9.2L20 8H7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="10" cy="20" r="1.4" fill="currentColor" />
+              <circle cx="17" cy="20" r="1.4" fill="currentColor" />
+            </svg>
+            <i id="cn">{cartCount}</i>
+          </Link>
+        </div>
+
+        {/* 3. Category Strip */}
+        <nav className="cs" aria-label="Categories">
+          <div className="w" id="cs">
+            <Link href="/marketplace">☰ All</Link>
+            <Link href="/marketplace?category=vegetables">Vegetables</Link>
+            <Link href="/marketplace?category=fruits">Fruits</Link>
+            <Link href="/marketplace?category=grains">Grains</Link>
+            <Link href="/marketplace?category=pulses">Pulses</Link>
+            <Link href="/marketplace?category=seasonal">Seasonal Produce</Link>
+            <a href="/#demo">Live demo</a>
+            <a href="/#closing-soon">Closing soon</a>
+            <Link href="/register?role=logistics">Logistics</Link>
+            <Link href="/register?role=wholesaler">Storage</Link>
+            <Link href="/register?role=seller">Sell on FreshRoute</Link>
+          </div>
+        </nav>
+      </header>
+    </>
   );
 }
-

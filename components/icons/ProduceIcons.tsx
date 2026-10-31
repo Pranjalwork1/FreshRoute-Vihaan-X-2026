@@ -1,4 +1,5 @@
 import React from "react";
+import { PRODUCE_IMAGES } from "@/lib/produceImages";
 
 export function ProduceSvgDefs() {
   return (
@@ -81,8 +82,44 @@ export function ProduceSvgDefs() {
         <symbol id="i-b" viewBox="0 0 24 24">
           <path d="M5 20V10M12 20V4M19 20v-7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </symbol>
+        <symbol id="i-sh" viewBox="0 0 24 24">
+          <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" fill="none" stroke="currentColor" strokeWidth="1.8" />
+          <path d="m9 12 2 2 4-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </symbol>
+        <symbol id="i-lk" viewBox="0 0 24 24">
+          <rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M8 11V8a4 4 0 018 0v3" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </symbol>
+        <symbol id="i-tg" viewBox="0 0 24 24">
+          <path d="M20 12l-8 8-8-8V4h8z" fill="none" stroke="currentColor" strokeWidth="1.8" />
+          <circle cx="8.5" cy="8.5" r="1.3" fill="currentColor" />
+        </symbol>
       </defs>
     </svg>
+  );
+}
+
+export function ProducePhoto({
+  name,
+  alt = "",
+  className = "",
+  style,
+}: {
+  name: string;
+  alt?: string;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  const imgSrc = PRODUCE_IMAGES[name] || PRODUCE_IMAGES[name.toLowerCase()] || PRODUCE_IMAGES["tomato"];
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={imgSrc}
+      alt={alt || name}
+      className={className}
+      style={style}
+      loading="lazy"
+    />
   );
 }
 

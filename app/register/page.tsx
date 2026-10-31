@@ -3,343 +3,732 @@
 import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FreshRouteLogo, ProduceSvg } from "@/components/icons/ProduceIcons";
+import { AuthBrandedPanel } from "@/components/auth/AuthBrandedPanel";
+import { ProduceSvgDefs } from "@/components/icons/ProduceIcons";
 import { createClient } from "@/lib/supabase/client";
-import { registerSchema } from "@/lib/validations/auth";
 
-function RegisterForm() {
+const STEP_NAMES = [
+  "Account",
+  "Activities",
+  "Business",
+  "Location",
+  "Verify",
+];
+
+const ACTIVITIES = [
+  {
+    id: "sell",
+    title: "Sell produce",
+    desc: "Farmers and local vendors",
+    role: "seller",
+  },
+  {
+    id: "buy",
+    title: "Buy produce",
+    desc: "Retailers and shops",
+    role: "buyer",
+  },
+  {
+    id: "bulk",
+    title: "Buy in bulk",
+    desc: "Wholesalers and institutional buyers",
+    role: "wholesaler",
+  },
+  {
+    id: "haul",
+    title: "Transport or storage",
+    desc: "Logistics providers and cold rooms",
+    role: "logistics",
+  },
+];
+
+const STATES = [
+  "Uttar Pradesh",
+  "Delhi",
+  "Haryana",
+  "Punjab",
+  "Maharashtra",
+  "Karnataka",
+  "Madhya Pradesh",
+  "Rajasthan",
+  "Gujarat",
+  "Bihar",
+  "West Bengal",
+  "Tamil Nadu",
+  "Other",
+];
+
+function RegisterWizardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const intent = searchParams.get("intent") || "";
+  const initialRole = searchParams.get("role") || "seller";
 
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [termsConsent, setTermsConsent] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [complete, setComplete] = useState(false);
 
-  // Compute password strength
-  const getPasswordStrength = () => {
-    if (!password) return { score: 0, text: "" };
+  // Form State
+  const [fullName, setFullName] = useState("");
+  const [emailOrPhone, setEmailOrPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedActivities, setSelectedActivities] = useState<string[]>([
+    initialRole === "buyer"
+      ? "buy"
+      : initialRole === "wholesaler"
+      ? "bulk"
+      : initialRole === "logistics"
+      ? "haul"
+      : "sell",
+  ]);
+
+  // Business state
+  const [businessData, setBusinessData] = useState<Record<string, string>>({
+    sell_name: "",
+    sell_crops: "",
+    sell_area: "",
+    buy_name: "",
+    buy_items: "",
+    bulk_name: "",
+    bulk_capacity: "5000",
+    bulk_produce: "",
+    haul_type: "Pickup",
+    haul_capacity: "1500",
+    haul_area: "",
+  });
+
+  // Location state
+  const [stateName, setStateName] = useState("");
+  const [district, setDistrict] = useState("");
+  const [pincode, setPincode] = useState("");
+
+  // Verification state
+  const [verifyChoice, setVerifyChoice] = useState("later");
+
+  // Errors
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Password strength (0 to 4)
+  const calculatePasswordStrength = (p: string) => {
     let score = 0;
-    if (password.length >= 6) score++;
-    if (password.length >= 8) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
+    if (p.length >= 8) score++;
+    if (/[A-Z]/.test(p)) score++;
+    if (/\d/.test(p)) score++;
+    if (/[^A-Za-z0-9]/.test(p)) score++;
+    return score;
+  };
+  const strength = calculatePasswordStrength(password);
 
-    if (score <= 2) return { score: 1, text: "Weak", color: "bg-red-500" };
-    if (score <= 3) return { score: 2, text: "Medium", color: "bg-amber-500" };
-    return { score: 3, text: "Strong", color: "bg-green-600" };
+  const toggleActivity = (id: string) => {
+    if (selectedActivities.includes(id)) {
+      if (selectedActivities.length > 1) {
+        setSelectedActivities(selectedActivities.filter((a) => a !== id));
+      }
+    } else {
+      setSelectedActivities([...selectedActivities, id]);
+    }
   };
 
-  const strength = getPasswordStrength();
+  const validateStep = (s: number) => {
+    const errs: Record<string, string> = {};
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    const validation = registerSchema.safeParse({
-      fullName,
-      email,
-      phone,
-      password,
-      confirmPassword,
-      termsConsent,
-    });
-
-    if (!validation.success) {
-      setError(validation.error.errors[0].message);
-      return;
+    if (s === 0) {
+      if (!fullName.trim() || fullName.trim().length < 2) {
+        errs.fullName = "Enter your full name";
+      }
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailOrPhone.trim());
+      const isPhone = /^\+?\d{10,13}$/.test(emailOrPhone.replace(/[\s-]/g, ""));
+      if (!isEmail && !isPhone) {
+        errs.emailOrPhone = "Enter a valid email or 10-digit phone number";
+      }
+      if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+        errs.password = "Use at least 8 characters, with a letter and a number";
+      }
+    } else if (s === 1) {
+      if (selectedActivities.length === 0) {
+        errs.activities = "Choose at least one activity";
+      }
+    } else if (s === 2) {
+      if (selectedActivities.includes("sell") && !businessData.sell_name.trim()) {
+        errs.sell_name = "Farm or shop name is required";
+      }
+      if (selectedActivities.includes("buy") && !businessData.buy_name.trim()) {
+        errs.buy_name = "Business name is required";
+      }
+      if (selectedActivities.includes("bulk") && !businessData.bulk_name.trim()) {
+        errs.bulk_name = "Business name is required";
+      }
+    } else if (s === 3) {
+      if (!stateName) {
+        errs.state = "Choose your state";
+      }
+      if (!district.trim()) {
+        errs.district = "Enter your district";
+      }
     }
 
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleNext = () => {
+    if (!validateStep(step)) return;
+    if (step < 4) {
+      setStep(step + 1);
+    } else {
+      handleSubmitRegistration();
+    }
+  };
+
+  const handleBack = () => {
+    setErrors({});
+    if (step > 0) setStep(step - 1);
+  };
+
+  const getPrimaryRole = () => {
+    if (selectedActivities.includes("sell")) return "seller";
+    if (selectedActivities.includes("bulk")) return "wholesaler";
+    if (selectedActivities.includes("haul")) return "logistics";
+    return "buyer";
+  };
+
+  const handleSubmitRegistration = async () => {
     setLoading(true);
+    setErrors({});
 
     try {
+      const primaryRole = getPrimaryRole();
       const supabase = createClient();
-      if (!supabase) {
-        // Fallback demo account persistence when Supabase credentials are not yet configured
-        const demoUser = {
-          id: "demo-user-" + Date.now(),
+
+      if (supabase) {
+        const email = emailOrPhone.includes("@")
+          ? emailOrPhone.trim()
+          : `${emailOrPhone.replace(/\D/g, "")}@freshroute.local`;
+
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email,
-          phone,
-          full_name: fullName,
-        };
-        localStorage.setItem("freshroute_demo_user", JSON.stringify(demoUser));
-        router.push(`/onboarding?intent=${encodeURIComponent(intent)}`);
-        return;
-      }
-
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            phone: phone,
+          password,
+          options: {
+            data: {
+              full_name: fullName.trim(),
+              role: primaryRole,
+              activities: selectedActivities,
+              state: stateName,
+              district: district.trim(),
+              pincode: pincode.trim(),
+              verified: verifyChoice === "now",
+            },
           },
-        },
-      });
-
-      if (signUpError) {
-        setError(signUpError.message);
-        setLoading(false);
-        return;
-      }
-
-      if (data.user) {
-        await supabase.from("profiles").upsert({
-          id: data.user.id,
-          full_name: fullName,
-          phone: phone,
         });
 
-        router.push(`/onboarding?intent=${encodeURIComponent(intent)}`);
-        router.refresh();
+        if (signUpError) {
+          setErrors({ form: signUpError.message });
+          setLoading(false);
+          return;
+        }
       }
+
+      // Store local demo session as well
+      localStorage.setItem(
+        "freshroute_demo_user",
+        JSON.stringify({
+          email: emailOrPhone,
+          full_name: fullName,
+          role: primaryRole,
+          activities: selectedActivities,
+          state: stateName,
+          district,
+        })
+      );
+
+      setLoading(false);
+      setComplete(true);
     } catch (err: any) {
-      setError(err?.message || "An unexpected error occurred during registration.");
-    } finally {
+      setErrors({ form: err?.message || "Failed to complete registration" });
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-[var(--bg)]">
-      {/* Left Branding & Benefits Panel (Hidden on small screens) */}
-      <div className="hidden lg:flex lg:col-span-5 bg-[var(--tint)] border-r border-[var(--line)] p-12 flex-col justify-between relative overflow-hidden">
-        <div>
-          <Link href="/" className="logo text-2xl font-extrabold flex items-center gap-2 mb-8">
-            <FreshRouteLogo className="w-8 h-8" />
-            FreshRoute
-          </Link>
+    <div id="app" style={{ display: "block", minHeight: "100vh" }}>
+      <ProduceSvgDefs />
+      <div className="au" id="au">
+        <AuthBrandedPanel />
 
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--acc)] bg-white/70 px-2.5 py-1 rounded-full border border-[var(--line)]">
-            Phase 1 • Commercial Account Creation
-          </span>
-
-          <h1 className="text-3xl font-extrabold text-[var(--ink)] tracking-tight mt-4 mb-3">
-            From Surplus to Opportunity.
-          </h1>
-          <p className="text-sm text-[var(--mute)] leading-relaxed mb-8">
-            Join the agricultural marketplace connecting cultivators, vendors, retailers, wholesalers, and transporters across regional supply corridors.
-          </p>
-
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="w-7 h-7 rounded-full bg-[var(--acc)] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                ✓
-              </div>
-              <div>
-                <h4 className="font-bold text-sm text-[var(--ink)]">Multi-Role Architecture</h4>
-                <p className="text-xs text-[var(--mute)]">
-                  Act as a farmer and buyer under one unified account without signing up twice.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-7 h-7 rounded-full bg-[var(--acc)] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                ✓
-              </div>
-              <div>
-                <h4 className="font-bold text-sm text-[var(--ink)]">Zero Hidden Brokerage</h4>
-                <p className="text-xs text-[var(--mute)]">
-                  Disclose harvest specifications directly with transparent unit rates.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="w-7 h-7 rounded-full bg-[var(--acc)] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                ✓
-              </div>
-              <div>
-                <h4 className="font-bold text-sm text-[var(--ink)]">Prevent Post-Harvest Waste</h4>
-                <p className="text-xs text-[var(--mute)]">
-                  Reach serious buyers before perishable crops lose commercial viability.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Decorative crop illustration preview */}
-        <div className="mt-8 pt-6 border-t border-[var(--line)] flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white border border-[var(--line)] flex items-center justify-center">
-            <ProduceSvg name="tomato" className="w-8 h-8" />
-          </div>
-          <div className="w-14 h-14 rounded-2xl bg-white border border-[var(--line)] flex items-center justify-center">
-            <ProduceSvg name="wheat" className="w-8 h-8" />
-          </div>
-          <div className="w-14 h-14 rounded-2xl bg-white border border-[var(--line)] flex items-center justify-center">
-            <ProduceSvg name="crate" className="w-8 h-8" />
-          </div>
-          <div className="text-xs text-[var(--mute)]">
-            Verified agricultural supply network
-          </div>
-        </div>
-      </div>
-
-      {/* Right Registration Form Panel */}
-      <div className="lg:col-span-7 flex flex-col justify-center items-center p-6 sm:p-12">
-        <div className="w-full max-w-lg">
-          <div className="lg:hidden mb-6 text-center">
-            <Link href="/" className="logo text-2xl font-extrabold inline-flex items-center gap-2">
-              <FreshRouteLogo className="w-7 h-7" />
-              FreshRoute
-            </Link>
-          </div>
-
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold tracking-tight text-[var(--ink)]">
-              Create your FreshRoute Account
-            </h2>
-            <p className="text-xs text-[var(--mute)] mt-1">
-              Step 1 of 2: Create account credentials, then select your business capabilities.
-            </p>
-          </div>
-
-          {error && (
-            <div className="mb-5 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <label>
-                Full Name
-                <input
-                  required
-                  type="text"
-                  autoComplete="name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="e.g. Ramesh Patil"
-                />
-              </label>
-
-              <label>
-                Phone Number
-                <input
-                  required
-                  type="tel"
-                  autoComplete="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="e.g. 9876543210"
-                />
-              </label>
-            </div>
-
-            <label>
-              Email Address
-              <input
-                required
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
-              />
-            </label>
-
-            <label>
-              <div className="flex justify-between items-center">
-                <span>Password (min. 6 characters)</span>
-                {strength.text && (
-                  <span className="text-[11px] font-semibold text-[var(--mute)]">
-                    Strength: <strong className={strength.score === 3 ? "text-green-700" : "text-amber-600"}>{strength.text}</strong>
-                  </span>
-                )}
-              </div>
-              <div className="relative">
-                <input
-                  required
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--mute)] font-semibold hover:text-[var(--ink)]"
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-            </label>
-
-            {/* Password strength bar */}
-            {password && (
-              <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden -mt-2">
-                <div
-                  className={`h-full ${strength.color} transition-all`}
-                  style={{ width: `${(strength.score / 3) * 100}%` }}
-                />
-              </div>
-            )}
-
-            <label>
-              Confirm Password
-              <div className="relative">
-                <input
-                  required
-                  type={showConfirmPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--mute)] font-semibold hover:text-[var(--ink)]"
-                >
-                  {showConfirmPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-            </label>
-
-            <div className="flex items-start gap-2 pt-2">
-              <input
-                id="terms"
-                type="checkbox"
-                checked={termsConsent}
-                onChange={(e) => setTermsConsent(e.target.checked)}
-                className="mt-1 w-4 h-4 rounded border-gray-300 text-[var(--acc)] focus:ring-[var(--acc)] cursor-pointer"
-              />
-              <label htmlFor="terms" className="text-xs text-[var(--mute)] leading-tight font-normal cursor-pointer">
-                I agree to the FreshRoute Terms of Service and Privacy Policy, and confirm my business details will be accurately declared.
-              </label>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn w-full mt-4 text-center disabled:opacity-50"
+        <section className="au-f">
+          <div className="tb" role="tablist">
+            <Link
+              role="tab"
+              id="tl"
+              aria-selected="false"
+              href="/login"
+              className="flex items-center justify-center"
             >
-              {loading ? "Creating Account..." : "Continue to Role Selection"}
-            </button>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-[var(--line)] text-center text-xs text-[var(--mute)]">
-            Already registered on FreshRoute?{" "}
-            <Link href="/login" className="font-bold text-[var(--acc)] hover:underline">
-              Sign In
+              Log in
             </Link>
+            <button role="tab" id="tr" aria-selected="true">
+              Create account
+            </button>
           </div>
-        </div>
+
+          <div id="rv">
+            {complete ? (
+              <div className="wp wz text-center py-6">
+                <svg
+                  className="w-14 h-14 mx-auto text-[var(--acc)] mb-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="m8 12 3 3 5-6" />
+                </svg>
+                <h3>You’re all set, {fullName.split(" ")[0]}</h3>
+                <p className="sub2">
+                  You chose:{" "}
+                  {selectedActivities
+                    .map(
+                      (a) =>
+                        ACTIVITIES.find((x) => x.id === a)?.title.toLowerCase()
+                    )
+                    .join(", ")}
+                  . Your workspace is configured and ready.
+                </p>
+                <div className="cta flex gap-3 justify-center mt-6">
+                  <Link
+                    className="btn"
+                    href={`/dashboard/${getPrimaryRole()}`}
+                  >
+                    Open my workspace
+                  </Link>
+                  <Link className="btn g" href="/">
+                    Back to homepage
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* 5-step progress indicators */}
+                <div className="sg">
+                  {STEP_NAMES.map((_, i) => (
+                    <i key={i} className={i <= step ? "on" : ""} />
+                  ))}
+                </div>
+                <div className="sgl">
+                  Step {step + 1} of 5: {STEP_NAMES[step]}
+                </div>
+
+                <div className="wp wz">
+                  {/* STEP 0: Account */}
+                  {step === 0 && (
+                    <>
+                      <h3>Create your account</h3>
+                      <p className="sub2">
+                        One account for everything you do on FreshRoute.
+                      </p>
+
+                      <label className={`fl ${errors.fullName ? "bad" : ""}`}>
+                        Full name
+                        <input
+                          name="name"
+                          type="text"
+                          autoComplete="name"
+                          placeholder="Ramesh Kumar"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                        />
+                        <span className="er" role="alert">
+                          {errors.fullName ? `• ${errors.fullName}` : ""}
+                        </span>
+                      </label>
+
+                      <label className={`fl ${errors.emailOrPhone ? "bad" : ""}`}>
+                        Email or phone number
+                        <input
+                          name="id"
+                          type="text"
+                          autoComplete="username"
+                          placeholder="you@example.com or 9876543210"
+                          value={emailOrPhone}
+                          onChange={(e) => setEmailOrPhone(e.target.value)}
+                        />
+                        <span className="er" role="alert">
+                          {errors.emailOrPhone ? `• ${errors.emailOrPhone}` : ""}
+                        </span>
+                      </label>
+
+                      <div className={`fl ${errors.password ? "bad" : ""}`}>
+                        <label htmlFor="rp">Password</label>
+                        <span className="pw">
+                          <input
+                            id="rp"
+                            name="pw"
+                            type={showPassword ? "text" : "password"}
+                            autoComplete="new-password"
+                            placeholder="At least 8 chars, letter & number"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? "Hide" : "Show"}
+                          </button>
+                        </span>
+                        <div className="sm" id="sm">
+                          <i className={strength >= 1 ? "on" : ""} />
+                          <i className={strength >= 2 ? "on" : ""} />
+                          <i className={strength >= 3 ? "on" : ""} />
+                          <i className={strength >= 4 ? "on" : ""} />
+                        </div>
+                        <span className="er" role="alert">
+                          {errors.password ? `• ${errors.password}` : ""}
+                        </span>
+                      </div>
+                    </>
+                  )}
+
+                  {/* STEP 1: Activities */}
+                  {step === 1 && (
+                    <>
+                      <h3>What will you do here?</h3>
+                      <p className="sub2">
+                        Pick one or more. You can add more later.
+                      </p>
+
+                      <div className="opts">
+                        {ACTIVITIES.map((act) => (
+                          <label key={act.id} className="opt">
+                            <input
+                              type="checkbox"
+                              value={act.id}
+                              checked={selectedActivities.includes(act.id)}
+                              onChange={() => toggleActivity(act.id)}
+                            />
+                            <b>{act.title}</b>
+                            <small>{act.desc}</small>
+                          </label>
+                        ))}
+                      </div>
+                      {errors.activities && (
+                        <span className="er block mt-2" role="alert">
+                          • {errors.activities}
+                        </span>
+                      )}
+                      <p className="fn">
+                        Admin accounts are assigned by operators and can’t be chosen here.
+                      </p>
+                    </>
+                  )}
+
+                  {/* STEP 2: Business details */}
+                  {step === 2 && (
+                    <>
+                      <h3>Tell us about your business</h3>
+                      <p className="sub2">
+                        Only what we need to get you started.
+                      </p>
+
+                      {selectedActivities.includes("sell") && (
+                        <fieldset className="fs">
+                          <legend>Sell produce</legend>
+                          <label className={`fl ${errors.sell_name ? "bad" : ""}`}>
+                            Farm or shop name
+                            <input
+                              type="text"
+                              placeholder="e.g. Green Valley Farm"
+                              value={businessData.sell_name}
+                              onChange={(e) =>
+                                setBusinessData({
+                                  ...businessData,
+                                  sell_name: e.target.value,
+                                })
+                              }
+                            />
+                            <span className="er" role="alert">
+                              {errors.sell_name ? `• ${errors.sell_name}` : ""}
+                            </span>
+                          </label>
+                          <label className="fl">
+                            Main crops or products
+                            <input
+                              type="text"
+                              placeholder="tomato, onion, potato"
+                              value={businessData.sell_crops}
+                              onChange={(e) =>
+                                setBusinessData({
+                                  ...businessData,
+                                  sell_crops: e.target.value,
+                                })
+                              }
+                            />
+                          </label>
+                          <label className="fl">
+                            Usual selling area
+                            <input
+                              type="text"
+                              placeholder="e.g. Nashik District"
+                              value={businessData.sell_area}
+                              onChange={(e) =>
+                                setBusinessData({
+                                  ...businessData,
+                                  sell_area: e.target.value,
+                                })
+                              }
+                            />
+                          </label>
+                        </fieldset>
+                      )}
+
+                      {selectedActivities.includes("buy") && (
+                        <fieldset className="fs">
+                          <legend>Buy produce</legend>
+                          <label className={`fl ${errors.buy_name ? "bad" : ""}`}>
+                            Shop or business name
+                            <input
+                              type="text"
+                              placeholder="e.g. Fresh Daily Mart"
+                              value={businessData.buy_name}
+                              onChange={(e) =>
+                                setBusinessData({
+                                  ...businessData,
+                                  buy_name: e.target.value,
+                                })
+                              }
+                            />
+                            <span className="er" role="alert">
+                              {errors.buy_name ? `• ${errors.buy_name}` : ""}
+                            </span>
+                          </label>
+                          <label className="fl">
+                            What do you usually buy?
+                            <input
+                              type="text"
+                              placeholder="vegetables, fruits"
+                              value={businessData.buy_items}
+                              onChange={(e) =>
+                                setBusinessData({
+                                  ...businessData,
+                                  buy_items: e.target.value,
+                                })
+                              }
+                            />
+                          </label>
+                        </fieldset>
+                      )}
+
+                      {selectedActivities.includes("bulk") && (
+                        <fieldset className="fs">
+                          <legend>Buy in bulk</legend>
+                          <label className={`fl ${errors.bulk_name ? "bad" : ""}`}>
+                            Business name
+                            <input
+                              type="text"
+                              placeholder="e.g. Apex Agri Trade"
+                              value={businessData.bulk_name}
+                              onChange={(e) =>
+                                setBusinessData({
+                                  ...businessData,
+                                  bulk_name: e.target.value,
+                                })
+                              }
+                            />
+                            <span className="er" role="alert">
+                              {errors.bulk_name ? `• ${errors.bulk_name}` : ""}
+                            </span>
+                          </label>
+                          <label className="fl">
+                            Procurement capacity (kg per week)
+                            <input
+                              type="number"
+                              placeholder="5000"
+                              value={businessData.bulk_capacity}
+                              onChange={(e) =>
+                                setBusinessData({
+                                  ...businessData,
+                                  bulk_capacity: e.target.value,
+                                })
+                              }
+                            />
+                          </label>
+                        </fieldset>
+                      )}
+
+                      {selectedActivities.includes("haul") && (
+                        <fieldset className="fs">
+                          <legend>Transport or storage</legend>
+                          <label className="fl">
+                            Vehicle type
+                            <select
+                              value={businessData.haul_type}
+                              onChange={(e) =>
+                                setBusinessData({
+                                  ...businessData,
+                                  haul_type: e.target.value,
+                                })
+                              }
+                            >
+                              <option>Pickup</option>
+                              <option>Mini truck</option>
+                              <option>Truck</option>
+                              <option>Refrigerated van</option>
+                            </select>
+                          </label>
+                          <label className="fl">
+                            Load capacity (kg)
+                            <input
+                              type="number"
+                              placeholder="1500"
+                              value={businessData.haul_capacity}
+                              onChange={(e) =>
+                                setBusinessData({
+                                  ...businessData,
+                                  haul_capacity: e.target.value,
+                                })
+                              }
+                            />
+                          </label>
+                        </fieldset>
+                      )}
+                    </>
+                  )}
+
+                  {/* STEP 3: Location */}
+                  {step === 3 && (
+                    <>
+                      <h3>Where are you based?</h3>
+                      <p className="sub2">
+                        Your exact pickup location stays private until an order is accepted.
+                      </p>
+
+                      <label className={`fl ${errors.state ? "bad" : ""}`}>
+                        State
+                        <select
+                          value={stateName}
+                          onChange={(e) => setStateName(e.target.value)}
+                        >
+                          <option value="">Choose a state</option>
+                          {STATES.map((st) => (
+                            <option key={st} value={st}>
+                              {st}
+                            </option>
+                          ))}
+                        </select>
+                        <span className="er" role="alert">
+                          {errors.state ? `• ${errors.state}` : ""}
+                        </span>
+                      </label>
+
+                      <label className={`fl ${errors.district ? "bad" : ""}`}>
+                        District
+                        <input
+                          type="text"
+                          placeholder="e.g. Meerut, Pune, Karnal"
+                          value={district}
+                          onChange={(e) => setDistrict(e.target.value)}
+                        />
+                        <span className="er" role="alert">
+                          {errors.district ? `• ${errors.district}` : ""}
+                        </span>
+                      </label>
+
+                      <label className="fl">
+                        Pincode (optional)
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          placeholder="110001"
+                          value={pincode}
+                          onChange={(e) => setPincode(e.target.value)}
+                        />
+                      </label>
+                    </>
+                  )}
+
+                  {/* STEP 4: Verification */}
+                  {step === 4 && (
+                    <>
+                      <h3>Verification</h3>
+                      <p className="sub2">
+                        You can start without it. We only ask for documents when there is a clear business or verification need, such as before large orders.
+                      </p>
+
+                      <div className="opts">
+                        <label className="opt">
+                          <input
+                            type="radio"
+                            name="vf"
+                            value="later"
+                            checked={verifyChoice === "later"}
+                            onChange={() => setVerifyChoice("later")}
+                          />
+                          <b>Verify later</b>
+                          <small>Recommended to start</small>
+                        </label>
+
+                        <label className="opt">
+                          <input
+                            type="radio"
+                            name="vf"
+                            value="now"
+                            checked={verifyChoice === "now"}
+                            onChange={() => setVerifyChoice("now")}
+                          />
+                          <b>Add details now</b>
+                          <small>Earns a trust label sooner</small>
+                        </label>
+                      </div>
+
+                      {errors.form && (
+                        <div
+                          className="nt mt-4"
+                          style={{
+                            background: "#FBEAE8",
+                            color: "#D9473A",
+                            borderColor: "#F0B9B3",
+                          }}
+                        >
+                          {errors.form}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                <div className="wb">
+                  <button
+                    type="button"
+                    className="btn g"
+                    onClick={handleBack}
+                    style={{ visibility: step > 0 ? "visible" : "hidden" }}
+                  >
+                    Back
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn"
+                    disabled={loading}
+                    onClick={handleNext}
+                  >
+                    {loading ? (
+                      <span className="spin" style={{ margin: "0 auto" }} />
+                    ) : step === 4 ? (
+                      "Create account"
+                    ) : (
+                      "Continue"
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );
@@ -347,8 +736,14 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-sm">Loading registration...</div>}>
-      <RegisterForm />
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="spin" />
+        </div>
+      }
+    >
+      <RegisterWizardContent />
     </Suspense>
   );
 }

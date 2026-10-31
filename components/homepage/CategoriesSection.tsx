@@ -1,42 +1,38 @@
 import React from "react";
 import Link from "next/link";
-import { ProduceSvg } from "@/components/icons/ProduceIcons";
+import { ProducePhoto, ProduceSvg } from "@/components/icons/ProduceIcons";
 
 const CATEGORIES = [
-  { name: "Vegetables", symbol: "tomato", bg: "#FBE3DE" },
-  { name: "Fruits", symbol: "mango", bg: "#FFF0D2" },
-  { name: "Grains", symbol: "wheat", bg: "#F6EBC9" },
-  { name: "Pulses", symbol: "pulses", bg: "#F3E2D0" },
-  { name: "Seasonal Produce", symbol: "pumpkin", bg: "#FFE6C9" },
-  { name: "Other Produce", symbol: "crate", bg: "#E8EFE3" },
+  { name: "Vegetables", key: "tomato", slug: "vegetables" },
+  { name: "Fruits", key: "pomegranate", slug: "fruits" },
+  { name: "Grains", key: "corn", slug: "grains" },
+  { name: "Pulses", key: "pulses", slug: "pulses", isSvg: true },
+  { name: "Seasonal Produce", key: "cauliflower", slug: "seasonal" },
+  { name: "Other Produce", key: "ginger", slug: "other" },
 ];
 
 export function CategoriesSection() {
   return (
-    <section>
-      <div className="hd">
-        <div>
-          <h2>Browse categories</h2>
-          <p className="sub" style={{ margin: 0 }}>
-            Jump straight to the produce you need.
-          </p>
-        </div>
-      </div>
-      <div className="cats" id="cats" style={{ marginTop: "28px" }}>
-        {CATEGORIES.map((c) => (
+    <section id="cats" style={{ paddingTop: "24px" }}>
+      <h2>Shop by category</h2>
+      <div className="cats" id="catgrid" style={{ marginTop: "24px" }}>
+        {CATEGORIES.map((cat) => (
           <Link
-            key={c.name}
+            key={cat.name}
             className="cat"
-            href={`/marketplace?category=${encodeURIComponent(c.name)}`}
+            href={`/marketplace?category=${cat.slug}`}
           >
-            <div style={{ background: c.bg }}>
-              <ProduceSvg name={c.symbol} />
+            <div style={{ background: "#F4F7F2" }}>
+              {cat.isSvg ? (
+                <ProduceSvg name={cat.key} className="w-12 h-12" />
+              ) : (
+                <ProducePhoto name={cat.key} alt={cat.name} />
+              )}
             </div>
-            {c.name}
+            {cat.name}
           </Link>
         ))}
       </div>
     </section>
   );
 }
-
