@@ -39,7 +39,7 @@ const SLIDES: Slide[] = [
       ["Join as a Provider", "btn o", "/register?role=logistics"],
       ["See how it works", "btn g", "#how"],
     ],
-    ph: ["tomato", "tomato2", "ginger", "potato", "corn"],
+    ph: ["tomato2", "ginger", "potato", "corn", "onion"],
   },
 ];
 

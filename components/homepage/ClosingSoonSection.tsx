@@ -6,7 +6,7 @@ export const SAMPLE_PRODUCE: ProduceItem[] = [
   {
     id: "corn",
     name: "Sweet corn",
-    locality: "Locality E",
+    locality: "Karnal, Haryana",
     qty: 400,
     price: 14,
     grade: "Grade B, seller-declared",
@@ -17,7 +17,7 @@ export const SAMPLE_PRODUCE: ProduceItem[] = [
   {
     id: "tomato",
     name: "Tomatoes",
-    locality: "Locality A",
+    locality: "Nashik, Maharashtra",
     qty: 500,
     price: 20,
     grade: "Grade B, seller-declared",
@@ -28,7 +28,7 @@ export const SAMPLE_PRODUCE: ProduceItem[] = [
   {
     id: "eggplant",
     name: "Brinjal",
-    locality: "Locality D",
+    locality: "Pune, Maharashtra",
     qty: 220,
     price: 24,
     grade: "Grade B, seller-declared",
@@ -39,7 +39,7 @@ export const SAMPLE_PRODUCE: ProduceItem[] = [
   {
     id: "pepper",
     name: "Green capsicum",
-    locality: "Locality A",
+    locality: "Meerut, Uttar Pradesh",
     qty: 120,
     price: 45,
     grade: "Grade A, seller-declared",
@@ -50,7 +50,7 @@ export const SAMPLE_PRODUCE: ProduceItem[] = [
   {
     id: "cauliflower",
     name: "Cauliflower",
-    locality: "Locality B",
+    locality: "Agra, Uttar Pradesh",
     qty: 260,
     price: 28,
     grade: "Grade A, seller-declared",
@@ -61,7 +61,7 @@ export const SAMPLE_PRODUCE: ProduceItem[] = [
   {
     id: "beetroot",
     name: "Beetroot",
-    locality: "Locality C",
+    locality: "Kolar, Karnataka",
     qty: 180,
     price: 22,
     grade: "Grade A, seller-declared",
@@ -72,7 +72,7 @@ export const SAMPLE_PRODUCE: ProduceItem[] = [
   {
     id: "pomegranate",
     name: "Pomegranate",
-    locality: "Locality F",
+    locality: "Solapur, Maharashtra",
     qty: 150,
     price: 65,
     grade: "Grade A, seller-declared",
@@ -83,7 +83,7 @@ export const SAMPLE_PRODUCE: ProduceItem[] = [
   {
     id: "potato",
     name: "Red potatoes",
-    locality: "Locality B",
+    locality: "Jalandhar, Punjab",
     qty: 300,
     price: 18,
     grade: "Grade A, seller-declared",
@@ -94,7 +94,7 @@ export const SAMPLE_PRODUCE: ProduceItem[] = [
   {
     id: "apple",
     name: "Golden apples",
-    locality: "Locality G",
+    locality: "Shimla, Himachal Pradesh",
     qty: 200,
     price: 80,
     grade: "Grade A, seller-declared",
@@ -105,11 +105,11 @@ export const SAMPLE_PRODUCE: ProduceItem[] = [
   {
     id: "onion",
     name: "Red onions",
-    locality: "Locality C",
+    locality: "Lasalgaon, Maharashtra",
     qty: 800,
     price: 16,
-    grade: "Grade not stated",
-    harvest: "Harvest date not given",
+    grade: "Grade A, seller-declared",
+    harvest: "Cured 2 days ago",
     deadlineHours: null,
     minQty: 100,
   },

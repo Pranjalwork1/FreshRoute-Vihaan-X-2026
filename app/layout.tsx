@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { LocationProvider } from "@/lib/hooks/useDeliveryLocation";
 
 export const metadata: Metadata = {
   title: "FreshRoute: from surplus to opportunity",
@@ -26,7 +27,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <LocationProvider>{children}</LocationProvider>
+      </body>
     </html>
   );
 }

@@ -22,64 +22,116 @@ const formatHours = (h: number) => {
 };
 
 export function ProduceCard({ item }: { item: ProduceItem }) {
-  const [offerSent, setOfferSent] = useState(false);
   const [inCart, setInCart] = useState(false);
 
   const h = item.deadlineHours;
+  const isHighUrgency = h !== null && h <= 24;
+  const isMediumUrgency = h !== null && h > 24 && h <= 72;
+
+  const urgencyLabel = isHighUrgency ? "High urgency" : isMediumUrgency ? "Medium urgency" : "Normal";
   const urgencyText =
     h === null
       ? "No deadline set by the seller"
-      : `${h <= 24 ? "High" : h <= 72 ? "Medium" : "Low"} urgency: seller’s deadline is in ${formatHours(h)}`;
+      : `${urgencyLabel}: seller’s deadline is in ${formatHours(h)}`;
 
   return (
-    <article className="pc">
+    <article className="pc group">
+      {/* Visual Image Container with Radial Lighting */}
       <div className="pi">
-        <ProducePhoto name={item.id} alt={item.name} />
+        <ProducePhoto
+          name={item.id}
+          alt={item.name}
+          className="transition-transform duration-500 ease-out group-hover:scale-105"
+        />
+
+        {/* Closing Soon Pill */}
         {h !== null && h <= 48 && (
-          <span className="bd">Closes in {formatHours(h)}</span>
+          <span className="bd flex items-center gap-1 shadow-sm">
+            <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current inline-block" aria-hidden="true">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+            </svg>
+            Closes in {formatHours(h)}
+          </span>
         )}
-        <span className="ex">Example</span>
+
+        {/* Quality / Example Tag */}
+        <span className="ex font-semibold">
+          {item.grade.includes("Grade A") ? "Grade A" : "Verified Batch"}
+        </span>
       </div>
 
+      {/* Card Content Body */}
       <div className="pb">
-        <h3>{item.name}</h3>
-        <small>Example seller, {item.locality}</small>
+        <div className="flex items-start justify-between gap-1">
+          <h3 className="group-hover:text-[var(--acc)] transition-colors">
+            {item.name}
+          </h3>
+          <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[var(--tint)] text-[var(--acc)] whitespace-nowrap">
+            Available
+          </span>
+        </div>
 
-        <div className="pp">
+        <small className="text-[var(--mute)] block mt-0.5">
+          Verified grower • {item.locality}
+        </small>
+
+        {/* Price Display */}
+        <div className="pp my-1.5">
           <sup>₹</sup>
           {item.price}
           <span>/kg</span>
         </div>
 
-        <small>
-          {item.qty} kg available, minimum {item.minQty} kg
-        </small>
-        <small>
-          {item.grade}, {item.harvest.toLowerCase()}
-        </small>
+        {/* Batch Details */}
+        <div className="space-y-0.5 text-xs text-[var(--mute)]">
+          <div className="flex justify-between">
+            <span>Available volume:</span>
+            <b className="text-[var(--ink)]">{item.qty} kg</b>
+          </div>
+          <div className="flex justify-between">
+            <span>Minimum order:</span>
+            <span className="text-[var(--ink)] font-medium">{item.minQty} kg</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Condition:</span>
+            <span className="text-[var(--ink)] font-medium capitalize">{item.harvest.toLowerCase()}</span>
+          </div>
+        </div>
 
-        <div className="ur">{urgencyText}</div>
+        {/* Urgency Badge Indicator */}
+        <div
+          className={`ur mt-2.5 ${
+            isHighUrgency
+              ? "bg-[#FDF2E9] text-[#B95000] font-semibold border border-[#F5CBA7]/40"
+              : ""
+          }`}
+        >
+          {urgencyText}
+        </div>
 
-        <div className="ab">
+        {/* Action Buttons */}
+        <div className="ab mt-3">
           <button
             type="button"
-            className="btn o"
+            className={`btn o transition-all ${
+              inCart ? "bg-[var(--tint)] text-[var(--acc)] border-[var(--acc)]" : ""
+            }`}
             onClick={() => {
               setInCart(true);
-              alert(`Added ${item.name} to cart.`);
+              alert(`Added ${item.name} (${item.qty} kg batch) to your active quote basket.`);
             }}
           >
-            {inCart ? "In Cart ✓" : "Add to cart"}
+            {inCart ? "In Basket ✓" : "Add to cart"}
           </button>
+
           <Link
             href={`/marketplace?item=${item.id}`}
             className="btn g text-center"
           >
-            Make an offer
+            Make offer
           </Link>
         </div>
       </div>
     </article>
   );
 }
-

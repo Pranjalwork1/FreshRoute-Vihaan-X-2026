@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { FreshRouteLogo } from "@/components/icons/ProduceIcons";
+import { useDeliveryLocation } from "@/lib/hooks/useDeliveryLocation";
+import { LocationSelectorModal } from "@/components/location/LocationSelectorModal";
 
 export function Header({
   user,
@@ -12,6 +14,9 @@ export function Header({
   const [category, setCategory] = useState("All categories");
   const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+
+  const { location, status: locationStatus } = useDeliveryLocation();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,12 +41,41 @@ export function Header({
 
   return (
     <>
-      {/* 1. Utility Top Bar */}
+      {/* 1. Utility Top Bar with Real Delivery Location */}
       <div className="ub">
         <div className="w">
-          <span>
-            Deliver to <b>Locality A</b> (example location)
+          <span className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setIsLocationModalOpen(true)}
+              className="flex items-center gap-1.5 text-inherit hover:text-white transition cursor-pointer text-left focus:outline-none"
+              aria-label="Select delivery location"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="w-3.5 h-3.5 flex-shrink-0 text-[#35A66F]"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
+              </svg>
+              {locationStatus === "detecting" ? (
+                <span className="animate-pulse">Detecting your location...</span>
+              ) : location ? (
+                <span>
+                  Deliver to — <b>{location.locality}, {location.city}</b>
+                  <span className="ml-1.5 text-[11px] underline opacity-80 hover:opacity-100 font-semibold">
+                    (Change)
+                  </span>
+                </span>
+              ) : (
+                <span>
+                  Deliver to — <b>Set your location</b>
+                </span>
+              )}
+            </button>
           </span>
+
           <span>
             <Link href="/register?role=seller">Sell on FreshRoute</Link>
             <span className="opacity-80 cursor-pointer">हिन्दी</span>
@@ -49,6 +83,11 @@ export function Header({
           </span>
         </div>
       </div>
+
+      <LocationSelectorModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+      />
 
       {/* 2. Main Forest Green Header */}
       <header className="tp">
