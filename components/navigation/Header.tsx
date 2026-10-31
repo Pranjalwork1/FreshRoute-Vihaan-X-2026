@@ -17,12 +17,18 @@ export function Header({
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  const { location, status: locationStatus } = useDeliveryLocation();
+  const { location, status: locationStatus, detectLocation } = useDeliveryLocation();
   const { cartCount } = useToastAndCart();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleOpenLocationModal = () => {
+    setIsLocationModalOpen(true);
+    // Directly request browser GPS permission on click
+    detectLocation();
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,30 +59,36 @@ export function Header({
           <span className="flex items-center gap-1.5">
             <button
               type="button"
-              onClick={() => setIsLocationModalOpen(true)}
-              className="flex items-center gap-1.5 text-inherit hover:text-white transition cursor-pointer text-left focus:outline-none"
+              id="loc-btn"
+              onClick={handleOpenLocationModal}
+              className="flex items-center gap-2 py-1 px-2.5 rounded-lg text-inherit hover:text-white hover:bg-white/10 transition-all cursor-pointer text-left focus:outline-none focus:ring-1 focus:ring-[#35A66F]"
               aria-label="Select delivery location"
             >
-              <svg
-                viewBox="0 0 24 24"
-                className="w-3.5 h-3.5 flex-shrink-0 text-[#35A66F]"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
-              </svg>
+              <span className="relative flex items-center justify-center">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-3.5 h-3.5 flex-shrink-0 text-[#35A66F]"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z" />
+                </svg>
+                {mounted && locationStatus === "detecting" && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#35A66F] animate-ping" />
+                )}
+              </span>
               {mounted && locationStatus === "detecting" ? (
-                <span className="animate-pulse">Detecting your location...</span>
+                <span className="animate-pulse font-medium text-white">Detecting your location...</span>
               ) : mounted && location ? (
                 <span>
-                  Deliver to — <b>{location.locality}, {location.city}</b>
-                  <span className="ml-1.5 text-[11px] underline opacity-80 hover:opacity-100 font-semibold">
+                  Deliver to — <b className="text-white font-semibold">{location.locality}, {location.city}</b>
+                  <span className="ml-1.5 text-[11px] underline opacity-85 hover:opacity-100 font-semibold text-[#80D2A6]">
                     (Change)
                   </span>
                 </span>
               ) : (
                 <span>
-                  Deliver to — <b>Set your location</b>
+                  Deliver to — <b className="text-white font-semibold">Set your location</b>
                 </span>
               )}
             </button>
