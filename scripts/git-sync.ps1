@@ -9,3 +9,4 @@ Write-Host "Using git at: $git"
 & $git commit -m "FreshRoute: Complete UI/UX migration from master HTML design across homepage, navigation, auth, and workspaces"
 & $git push origin main
 Write-Host "Git push complete."
+

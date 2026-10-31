@@ -82,3 +82,4 @@ export function ProduceCard({ item }: { item: ProduceItem }) {
     </article>
   );
 }
+
